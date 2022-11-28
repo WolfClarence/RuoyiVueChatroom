@@ -24,8 +24,10 @@ import com.ruoyi.system.service.ISysConfigService;
  */
 
 /**
- * yjh
- * 具体服务实现类
+ * 详细注释   @author yjh
+ * 服务实现类 实现了接口ISysConfigService 对应系统管理中的“参数设置”
+ * 主要功能：通过接收contraller层传来的参数，完成相应的业务（操作管理dao层获取想要的数据），并返回相应的结果
+ *
  */
 
 @Service
@@ -33,9 +35,11 @@ public class SysConfigServiceImpl implements ISysConfigService
 {
     @Autowired
     private SysConfigMapper configMapper;
+    //将操作数据的接口注入进去
 
     @Autowired
     private RedisCache redisCache;
+    //通过spring容器自动装配redis工具类
 
     /**
      * 项目启动时，初始化参数到缓存
@@ -45,9 +49,11 @@ public class SysConfigServiceImpl implements ISysConfigService
     {
         loadingConfigCache();
     }
+    //@PostConstruct：在对象加载完依赖注入后执行
 
     /**
      * 查询参数配置信息
+     * 通过参数配置ID返回一个参数配置项对象
      * 
      * @param configId 参数配置ID
      * @return 参数配置信息
@@ -70,19 +76,23 @@ public class SysConfigServiceImpl implements ISysConfigService
     @Override
     public String selectConfigByKey(String configKey)
     {
+        //通过com.ruoyi.common.core.text中的Convert类，将参数key转换为String型的configValue
         String configValue = Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
+        //通过com.ruoyi.common.utils中的StringUtils类，检查读出到的configValue是否未空
         if (StringUtils.isNotEmpty(configValue))
         {
             return configValue;
         }
         SysConfig config = new SysConfig();
         config.setConfigKey(configKey);
+        //根据键名查询参数配置信息
         SysConfig retConfig = configMapper.selectConfig(config);
         if (StringUtils.isNotNull(retConfig))
         {
             redisCache.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
         }
+        //如果configValue和retConfig都为空，返回一个null值
         return StringUtils.EMPTY;
     }
 
@@ -159,11 +169,14 @@ public class SysConfigServiceImpl implements ISysConfigService
         for (Long configId : configIds)
         {
             SysConfig config = selectConfigById(configId);
+            //检查是否为系统默认参数，只有非内置参数，才可以对其进行删除操作
             if (StringUtils.equals(UserConstants.YES, config.getConfigType()))
             {
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
+            //非内置参数，通过configMapper将对应configId的参数设置项删除
             configMapper.deleteConfigById(configId);
+            //同时删除Cache中的缓存
             redisCache.deleteObject(getCacheKey(config.getConfigKey()));
         }
     }
@@ -198,6 +211,7 @@ public class SysConfigServiceImpl implements ISysConfigService
     public void resetConfigCache()
     {
         clearConfigCache();
+        //清除参数缓存后再次加载
         loadingConfigCache();
     }
 
