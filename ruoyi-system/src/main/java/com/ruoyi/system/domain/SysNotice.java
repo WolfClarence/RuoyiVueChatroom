@@ -12,6 +12,11 @@ import com.ruoyi.common.xss.Xss;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 此类对应系统管理中的通知公告功能
+ */
 public class SysNotice extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

@@ -5,6 +5,11 @@ package com.ruoyi.system.domain;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 此类对应系统监控中的在线用户功能，可查看用户访问记录
+ */
 public class SysUserOnline
 {
     /** 会话编号 */
