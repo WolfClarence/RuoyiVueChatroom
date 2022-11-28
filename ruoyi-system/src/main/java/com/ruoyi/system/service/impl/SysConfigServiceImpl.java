@@ -22,6 +22,12 @@ import com.ruoyi.system.service.ISysConfigService;
  * 
  * @author ruoyi
  */
+
+/**
+ * yjh
+ * 具体服务实现类
+ */
+
 @Service
 public class SysConfigServiceImpl implements ISysConfigService
 {
