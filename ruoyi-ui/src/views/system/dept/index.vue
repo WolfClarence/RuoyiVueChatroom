@@ -1,6 +1,9 @@
 <template>
+  <!--自定义外层容器-->
   <div class="app-container">
+    <!--最上面一行的搜索/重置功能-->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch">
+      <!--el-form-item使用prop绑定字段-->
       <el-form-item label="部门名称" prop="deptName">
         <el-input
           v-model="queryParams.deptName"
@@ -10,7 +13,9 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="status">
+        <!--el-select配合el-option形成多选框-->
         <el-select v-model="queryParams.status" placeholder="部门状态" clearable>
+          <!--使用的值是定义在字典模块中的系统开关-->
           <el-option
             v-for="dict in dict.type.sys_normal_disable"
             :key="dict.value"
@@ -25,8 +30,10 @@
       </el-form-item>
     </el-form>
 
+    <!--第二行的新增按钮和展开/折叠按钮-->
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
+        <!--这里的v-hasPermi是自定义的指令权限，包含对应的权限字符串才能看到-->
         <el-button
           type="primary"
           plain
@@ -45,9 +52,11 @@
           @click="toggleExpandAll"
         >展开/折叠</el-button>
       </el-col>
+      <!--自定义的组件，用于实现隐藏搜索和刷新-->
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
+    <!--表格展示部门数据-->
     <el-table
       v-if="refreshTable"
       v-loading="loading"
@@ -56,6 +65,7 @@
       :default-expand-all="isExpandAll"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
+      <!--el-table-column也使用prop绑定字段-->
       <el-table-column prop="deptName" label="部门名称" width="260"></el-table-column>
       <el-table-column prop="orderNum" label="排序" width="200"></el-table-column>
       <el-table-column prop="status" label="状态" width="100">
@@ -84,6 +94,7 @@
             @click="handleAdd(scope.row)"
             v-hasPermi="['system:dept:add']"
           >新增</el-button>
+          <!--parentId不是0才能删除，否则就把根节点删除了-->
           <el-button
             v-if="scope.row.parentId != 0"
             size="mini"
@@ -97,9 +108,11 @@
     </el-table>
 
     <!-- 添加或修改部门对话框 -->
+    <!--点击操作里面的添加或者修改按钮，出现的对话框-->
     <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
+          <!--使用v-if，如果是根节点直接不显示上级部门-->
           <el-col :span="24" v-if="form.parentId !== 0">
             <el-form-item label="上级部门" prop="parentId">
               <treeselect v-model="form.parentId" :options="deptOptions" :normalizer="normalizer" placeholder="选择上级部门" />
@@ -224,6 +237,8 @@ export default {
   },
   methods: {
     /** 查询部门列表 */
+    //使用dept.js里面的listDept方法向后端发送请求，再使用ruoyi.js里面的handleTree方法队后端数据进行处理
+    //在没加载好时把loading置为true，加载好了再置为false，实现加载中的展示效果
     getList() {
       this.loading = true;
       listDept(this.queryParams).then(response => {
@@ -232,6 +247,7 @@ export default {
       });
     },
     /** 转换部门数据结构 */
+    //如果节点有孩子就删除孩子，然后返回一个node对象
     normalizer(node) {
       if (node.children && !node.children.length) {
         delete node.children;
@@ -262,15 +278,18 @@ export default {
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
+    //和getList方法一致
     handleQuery() {
       this.getList();
     },
     /** 重置按钮操作 */
+    //把queryForm表单重置后再查询一次
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
     /** 新增按钮操作 */
+    //表单重置，弹出一个对话框，把修改标题等属性，并且请求它的上级菜单
     handleAdd(row) {
       this.reset();
       if (row != undefined) {
@@ -283,6 +302,7 @@ export default {
       });
     },
     /** 展开/折叠操作 */
+    //修改isExpandAll即可改变展开/折叠的展示，并使用nextTick更新机制
     toggleExpandAll() {
       this.refreshTable = false;
       this.isExpandAll = !this.isExpandAll;
@@ -291,6 +311,7 @@ export default {
       });
     },
     /** 修改按钮操作 */
+    //表单重置，弹出一个对话框，把修改标题等属性，并且请求它的上级菜单（除去自己）
     handleUpdate(row) {
       this.reset();
       getDept(row.deptId).then(response => {
@@ -307,6 +328,7 @@ export default {
       });
     },
     /** 提交按钮 */
+    //使用后端接口进行修改和新增
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -327,6 +349,7 @@ export default {
       });
     },
     /** 删除按钮操作 */
+    //模态框进行确认操作，如果确定操作就调用后端接口删除
     handleDelete(row) {
       this.$modal.confirm('是否确认删除名称为"' + row.deptName + '"的数据项？').then(function() {
         return delDept(row.deptId);
