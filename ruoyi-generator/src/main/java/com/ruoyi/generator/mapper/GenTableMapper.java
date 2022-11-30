@@ -19,7 +19,7 @@ public interface GenTableMapper
     public List<GenTable> selectGenTableList(GenTable genTable);
 
     /**
-     * 查询据库列表
+     * 查询数据库列表
      * 
      * @param genTable 业务信息
      * @return 数据库表集合
@@ -27,7 +27,7 @@ public interface GenTableMapper
     public List<GenTable> selectDbTableList(GenTable genTable);
 
     /**
-     * 查询据库列表
+     * 查询数据库列表通过名称来查询
      * 
      * @param tableNames 表名称组
      * @return 数据库表集合

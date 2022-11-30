@@ -36,13 +36,21 @@ public class VelocityUtils
      */
     public static VelocityContext prepareContext(GenTable genTable)
     {
+        //获取生成的模块名称
         String moduleName = genTable.getModuleName();
+        //获取生成的业务名称
         String businessName = genTable.getBusinessName();
+        //获取生成的包名
         String packageName = genTable.getPackageName();
+        //获取所使用的模板类型
         String tplCategory = genTable.getTplCategory();
+        //获取要生成的函数名称
         String functionName = genTable.getFunctionName();
 
+        //创建velocityContext 实例
         VelocityContext velocityContext = new VelocityContext();
+
+        //将参数绑定名称加入到velocityContext
         velocityContext.put("tplCategory", genTable.getTplCategory());
         velocityContext.put("tableName", genTable.getTableName());
         velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
@@ -62,6 +70,7 @@ public class VelocityUtils
         velocityContext.put("table", genTable);
         velocityContext.put("dicts", getDicts(genTable));
         setMenuVelocityContext(velocityContext, genTable);
+
         if (GenConstants.TPL_TREE.equals(tplCategory))
         {
             setTreeVelocityContext(velocityContext, genTable);
@@ -73,6 +82,11 @@ public class VelocityUtils
         return velocityContext;
     }
 
+    /**
+     * 设置模板菜单
+     * @param context
+     * @param genTable
+     */
     public static void setMenuVelocityContext(VelocityContext context, GenTable genTable)
     {
         String options = genTable.getOptions();
