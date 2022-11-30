@@ -37,7 +37,7 @@ import com.ruoyi.system.service.ISysUserService;
  */
 
 /**
- *  详细注释 @author yjh
+ *  详细注释  @author yjh
  *  服务实现类 实现了接口ISysUserService 对应系统管理中的“用户管理”
  *  主要功能；可以对系统中某个部门的用户执行操作，如查询某个部门中的用户的相关信息、停用某个用户等，同时实现了部门树和用户的关联操作
  *  提供了多种查询用户的方式、及用户的增删改操作。

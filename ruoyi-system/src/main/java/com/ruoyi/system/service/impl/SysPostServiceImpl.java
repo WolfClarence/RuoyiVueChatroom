@@ -18,7 +18,7 @@ import com.ruoyi.system.service.ISysPostService;
  */
 
 /**
- *  详细注释 @author yjh
+ *  详细注释  @author yjh
  *  服务实现类 实现了接口ISysPostService 对应系统管理中的“岗位管理”
  *  主要功能；对系统的岗位进行增删改查操作，如增加一个项目经理的岗位等，并根据相应的要求对数据库进行操作
  */

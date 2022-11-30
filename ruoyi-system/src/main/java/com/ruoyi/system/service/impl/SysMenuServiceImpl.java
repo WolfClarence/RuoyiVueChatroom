@@ -32,7 +32,7 @@ import com.ruoyi.system.service.ISysMenuService;
  */
 
 /**
- *  详细注释 @author yjh
+ *  详细注释  @author yjh
  *  服务实现类 实现了接口ISysMenuService 对应系统管理中的“菜单管理”
  *  主要功能；对com.ruoyi.common.core.domain.entity中的SysMenu、SysRole、SysUser进行操作，可以增加系统左侧菜单中的菜单项
  */

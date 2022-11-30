@@ -32,7 +32,7 @@ import com.ruoyi.system.service.ISysRoleService;
  */
 
 /**
- *  详细注释 @author yjh
+ *  详细注释  @author yjh
  *  服务实现类 实现了接口ISysRoleService 对应系统管理中的“角色管理”
  *  主要功能；对系统的角色（超级管理员、普通角色）进行增删改查操作，如停用一个“普通角色”等，并根据相应的要求对数据库进行操作
  */

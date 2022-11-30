@@ -28,7 +28,7 @@ import com.ruoyi.system.service.ISysDeptService;
  */
 
 /**
- * 详细注释 @author yjh
+ * 详细注释  @author yjh
  * 服务实现类 实现了接口ISysDeptService 对应系统管理中的“部门管理”
  * 主要功能：通过接收contraller层传来的参数，完成相应的业务（操作管理dao层获取想要的数据），如根据部门ID查询信息、新增保存部门信息等，并返回相应的结果
  */
