@@ -26,14 +26,23 @@ import com.ruoyi.system.service.ISysDeptService;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释 @author yjh
+ * 服务实现类 实现了接口ISysDeptService 对应系统管理中的“部门管理”
+ * 主要功能：通过接收contraller层传来的参数，完成相应的业务（操作管理dao层获取想要的数据），如根据部门ID查询信息、新增保存部门信息等，并返回相应的结果
+ */
+
 @Service
 public class SysDeptServiceImpl implements ISysDeptService
 {
     @Autowired
     private SysDeptMapper deptMapper;
+    //对数据库中的部门信息进行操作
 
     @Autowired
     private SysRoleMapper roleMapper;
+    //对数据库中的角色信息进行操作
 
     /**
      * 查询部门管理数据
@@ -316,6 +325,8 @@ public class SysDeptServiceImpl implements ISysDeptService
 
     /**
      * 得到子节点列表
+     *
+     * 得到部门t的子节点部门列表，并返回一个子节点列表
      */
     private List<SysDept> getChildList(List<SysDept> list, SysDept t)
     {
@@ -324,6 +335,7 @@ public class SysDeptServiceImpl implements ISysDeptService
         while (it.hasNext())
         {
             SysDept n = (SysDept) it.next();
+            //如果该节点的父部门不为空且父部门id等于t部门的id，说明为t部门的子部门
             if (StringUtils.isNotNull(n.getParentId()) && n.getParentId().longValue() == t.getDeptId().longValue())
             {
                 tlist.add(n);

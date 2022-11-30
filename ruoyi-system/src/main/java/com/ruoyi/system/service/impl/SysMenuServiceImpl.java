@@ -30,6 +30,12 @@ import com.ruoyi.system.service.ISysMenuService;
  * 
  * @author ruoyi
  */
+
+/**
+ *  详细注释 @author yjh
+ *  服务实现类 实现了接口ISysMenuService 对应系统管理中的“菜单管理”
+ *  主要功能；对com.ruoyi.common.core.domain.entity中的SysMenu、SysRole、SysUser进行操作，可以增加系统左侧菜单中的菜单项
+ */
 @Service
 public class SysMenuServiceImpl implements ISysMenuService
 {
@@ -37,12 +43,15 @@ public class SysMenuServiceImpl implements ISysMenuService
 
     @Autowired
     private SysMenuMapper menuMapper;
+    //对数据库中的菜单信息进行操作
 
     @Autowired
     private SysRoleMapper roleMapper;
+    //对数据库中的角色信息进行操作
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
+    //对数据库中的角色与菜单关联表进行操作
 
     /**
      * 根据用户查询系统菜单列表
