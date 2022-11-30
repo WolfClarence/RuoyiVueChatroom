@@ -2,14 +2,17 @@
   <div class="app-container">
     <el-row :gutter="20">
       <el-col :span="6" :xs="24">
+        <!--使用el-card组件展示个人信息-->
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>个人信息</span>
           </div>
           <div>
             <div class="text-center">
+              <!--使用自定义的用户头像组件-->
               <userAvatar :user="user" />
             </div>
+            <!--展示用户信息的列表-->
             <ul class="list-group list-group-striped">
               <li class="list-group-item">
                 <svg-icon icon-class="user" />用户名称
@@ -49,6 +52,7 @@
               <userInfo :user="user" />
             </el-tab-pane>
             <el-tab-pane label="修改密码" name="resetPwd">
+              <!--使用自定义的重置密码组件-->
               <resetPwd />
             </el-tab-pane>
           </el-tabs>
@@ -75,10 +79,12 @@ export default {
       activeTab: "userinfo"
     };
   },
+  //初始化时获取用户信息
   created() {
     this.getUser();
   },
   methods: {
+    //使用user.js中的getUserProfile查询用户信息
     getUser() {
       getUserProfile().then(response => {
         this.user = response.data;

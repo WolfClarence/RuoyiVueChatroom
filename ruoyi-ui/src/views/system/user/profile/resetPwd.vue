@@ -1,4 +1,5 @@
 <template>
+  <!--用于重置密码的表单-->
   <el-form ref="form" :model="user" :rules="rules" label-width="80px">
     <el-form-item label="旧密码" prop="oldPassword">
       <el-input v-model="user.oldPassword" placeholder="请输入旧密码" type="password" show-password/>
@@ -51,6 +52,7 @@ export default {
     };
   },
   methods: {
+    //如果表单数据合法，使用后端接口，修改用户密码
     submit() {
       this.$refs["form"].validate(valid => {
         if (valid) {
