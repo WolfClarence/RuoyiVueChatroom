@@ -1,5 +1,8 @@
 <template>
   <el-card>
+<!--
+  表格展示
+-->
     <el-tabs v-model="activeName">
       <el-tab-pane label="基本信息" name="basic">
         <basic-info-form ref="basicInfo" :info="info" />
@@ -24,6 +27,7 @@
             min-width="10%"
             :show-overflow-tooltip="true"
           />
+<!--    Java类型      -->
           <el-table-column label="Java类型" min-width="11%">
             <template slot-scope="scope">
               <el-select v-model="scope.row.javaType">
@@ -37,32 +41,37 @@
               </el-select>
             </template>
           </el-table-column>
+<!--    java属性      -->
           <el-table-column label="java属性" min-width="10%">
             <template slot-scope="scope">
               <el-input v-model="scope.row.javaField"></el-input>
             </template>
           </el-table-column>
-
+<!--     插入     -->
           <el-table-column label="插入" min-width="5%">
             <template slot-scope="scope">
               <el-checkbox true-label="1" false-label="0" v-model="scope.row.isInsert"></el-checkbox>
             </template>
           </el-table-column>
+<!--    编辑      -->
           <el-table-column label="编辑" min-width="5%">
             <template slot-scope="scope">
               <el-checkbox true-label="1" false-label="0" v-model="scope.row.isEdit"></el-checkbox>
             </template>
           </el-table-column>
+<!--     列表     -->
           <el-table-column label="列表" min-width="5%">
             <template slot-scope="scope">
               <el-checkbox true-label="1" false-label="0" v-model="scope.row.isList"></el-checkbox>
             </template>
           </el-table-column>
+<!--     查询     -->
           <el-table-column label="查询" min-width="5%">
             <template slot-scope="scope">
               <el-checkbox true-label="1" false-label="0" v-model="scope.row.isQuery"></el-checkbox>
             </template>
           </el-table-column>
+<!--     查询方式     -->
           <el-table-column label="查询方式" min-width="10%">
             <template slot-scope="scope">
               <el-select v-model="scope.row.queryType">
@@ -82,6 +91,7 @@
               <el-checkbox true-label="1" false-label="0" v-model="scope.row.isRequired"></el-checkbox>
             </template>
           </el-table-column>
+<!--     显示类型     -->
           <el-table-column label="显示类型" min-width="12%">
             <template slot-scope="scope">
               <el-select v-model="scope.row.htmlType">
@@ -97,6 +107,7 @@
               </el-select>
             </template>
           </el-table-column>
+<!--    字典类型      -->
           <el-table-column label="字典类型" min-width="12%">
             <template slot-scope="scope">
               <el-select v-model="scope.row.dictType" clearable filterable placeholder="请选择">
@@ -135,49 +146,97 @@ import genInfoForm from "./genInfoForm";
 import Sortable from 'sortablejs'
 
 export default {
+  /*
+  该组件的名称
+   */
   name: "GenEdit",
+  /*
+  该组件使用的外部组件
+   */
   components: {
     basicInfoForm,
     genInfoForm
   },
+  /*
+  该组件的数据参数
+   */
   data() {
     return {
+      /*
+      选中选项卡的 name
+       */
       // 选中选项卡的 name
       activeName: "columnInfo",
+      /*
+      表格的高度
+       */
       // 表格的高度
       tableHeight: document.documentElement.scrollHeight - 245 + "px",
+      /*
+      表信息
+       */
       // 表信息
       tables: [],
+      /*
+      表列信息
+       */
       // 表列信息
       columns: [],
+      /*
+      字典信息
+       */
       // 字典信息
       dictOptions: [],
+      /*
+      菜单信息
+       */
       // 菜单信息
       menus: [],
+      /*
+      表详细信息
+       */
       // 表详细信息
       info: {}
     };
   },
+  /*
+  created生命周期函数，在该组件创立之初进行调用
+   */
   created() {
     const tableId = this.$route.params && this.$route.params.tableId;
     if (tableId) {
+      /*
+      获取表详细信息
+       */
       // 获取表详细信息
       getGenTable(tableId).then(res => {
         this.columns = res.data.rows;
         this.info = res.data.info;
         this.tables = res.data.tables;
       });
+      /*
+      查询字典下拉列表的功能实现
+       */
       /** 查询字典下拉列表 */
       getDictOptionselect().then(response => {
         this.dictOptions = response.data;
       });
+      /*
+      查询菜单下拉列表的功能实现
+       */
       /** 查询菜单下拉列表 */
       getMenuTreeselect().then(response => {
         this.menus = this.handleTree(response.data, "menuId");
       });
     }
   },
+  /*
+  该组件的一些方法的集合
+   */
   methods: {
+    /*
+    实现提交按钮功能的集合
+     */
     /** 提交按钮 */
     submitForm() {
       const basicForm = this.$refs.basicInfo.$refs.basicInfoForm;
@@ -187,12 +246,18 @@ export default {
         if (validateResult) {
           const genTable = Object.assign({}, basicForm.model, genForm.model);
           genTable.columns = this.columns;
+          /*
+          得到表格中的数据
+           */
           genTable.params = {
             treeCode: genTable.treeCode,
             treeName: genTable.treeName,
             treeParentCode: genTable.treeParentCode,
             parentMenuId: genTable.parentMenuId
           };
+          /*
+          更新表格的数据
+           */
           updateGenTable(genTable).then(res => {
             this.$modal.msgSuccess(res.msg);
             if (res.code === 200) {
@@ -204,6 +269,9 @@ export default {
         }
       });
     },
+    /*
+    得到表单从后端获取的信息
+     */
     getFormPromise(form) {
       return new Promise(resolve => {
         form.validate(res => {
@@ -211,12 +279,18 @@ export default {
         });
       });
     },
+    /*
+    关闭按钮的功能实现
+     */
     /** 关闭按钮 */
     close() {
       const obj = { path: "/tool/gen", query: { t: Date.now(), pageNum: this.$route.query.pageNum } };
       this.$tab.closeOpenPage(obj);
     }
   },
+  /*
+  mounted生命周期钩子，实现一下数据的初始化
+   */
   mounted() {
     const el = this.$refs.dragTable.$el.querySelectorAll(".el-table__body-wrapper > table > tbody")[0];
     const sortable = Sortable.create(el, {

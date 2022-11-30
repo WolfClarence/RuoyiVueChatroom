@@ -1,5 +1,8 @@
-<template>
+  <template>
   <div class="app-container">
+<!--
+  sql建表信息输入表单
+-->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="表名称" prop="tableName">
         <el-input
@@ -80,6 +83,9 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
+<!--
+  表格展示
+-->
     <el-table v-loading="loading" :data="tableList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" align="center" width="55"></el-table-column>
       <el-table-column label="序号" type="index" width="50" align="center">
@@ -176,10 +182,16 @@
 </template>
 
 <script>
+/*
+导入外部数据
+ */
 import { listTable, previewTable, delTable, genCode, synchDb } from "@/api/tool/gen";
 import importTable from "./importTable";
 import hljs from "highlight.js/lib/highlight";
 import "highlight.js/styles/github-gist.css";
+/*
+注册语言
+ */
 hljs.registerLanguage("java", require("highlight.js/lib/languages/java"));
 hljs.registerLanguage("xml", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("html", require("highlight.js/lib/languages/xml"));
@@ -187,9 +199,21 @@ hljs.registerLanguage("vue", require("highlight.js/lib/languages/xml"));
 hljs.registerLanguage("javascript", require("highlight.js/lib/languages/javascript"));
 hljs.registerLanguage("sql", require("highlight.js/lib/languages/sql"));
 
+/*
+导出本组件的数据（简写形式）
+ */
 export default {
+  /*
+  组件的名称
+   */
   name: "Gen",
+  /*
+  组件使用的外部组件
+   */
   components: { importTable },
+  /*
+  本组件的数据参数
+   */
   data() {
     return {
       // 遮罩层
@@ -228,9 +252,15 @@ export default {
       }
     };
   },
+  /*
+  在组件初始化时自动实现数据加载
+   */
   created() {
     this.getList();
   },
+  /*
+  当本组件激活时自动执行该方法
+   */
   activated() {
     const time = this.$route.query.t;
     if (time != null && time != this.uniqueId) {
@@ -239,7 +269,13 @@ export default {
       this.getList();
     }
   },
+  /*
+  该组件的方法集合
+   */
   methods: {
+    /*
+    得到表的数据
+     */
     /** 查询表集合 */
     getList() {
       this.loading = true;
@@ -250,11 +286,17 @@ export default {
         }
       );
     },
+    /*
+    实现搜索按钮的功能
+     */
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /*
+    实现生成代码的功能
+     */
     /** 生成代码操作 */
     handleGenTable(row) {
       const tableNames = row.tableName || this.tableNames;
@@ -270,6 +312,9 @@ export default {
         this.$download.zip("/tool/gen/batchGenCode?tables=" + tableNames, "ruoyi");
       }
     },
+    /*
+    同步数据库操作
+     */
     /** 同步数据库操作 */
     handleSynchDb(row) {
       const tableName = row.tableName;
@@ -279,16 +324,25 @@ export default {
         this.$modal.msgSuccess("同步成功");
       }).catch(() => {});
     },
+    /*
+    打开导入表弹窗
+     */
     /** 打开导入表弹窗 */
     openImportTable() {
       this.$refs.import.show();
     },
+    /*
+    重置按钮操作
+     */
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    /*
+    预览按钮
+     */
     /** 预览按钮 */
     handlePreview(row) {
       previewTable(row.tableId).then(response => {
@@ -297,6 +351,9 @@ export default {
         this.preview.activeName = "domain.java";
       });
     },
+    /*
+    高亮显示
+     */
     /** 高亮显示 */
     highlightedCode(code, key) {
       const vmName = key.substring(key.lastIndexOf("/") + 1, key.indexOf(".vm"));
@@ -304,6 +361,9 @@ export default {
       const result = hljs.highlight(language, code || "", true);
       return result.value || '&nbsp;';
     },
+    /*
+    复制代码成功
+     */
     /** 复制代码成功 */
     clipboardSuccess() {
       this.$modal.msgSuccess("复制成功");
@@ -315,6 +375,9 @@ export default {
       this.single = selection.length != 1;
       this.multiple = !selection.length;
     },
+    /*
+    修改按钮操作
+     */
     /** 修改按钮操作 */
     handleEditTable(row) {
       const tableId = row.tableId || this.ids[0];
@@ -322,6 +385,9 @@ export default {
       const params = { pageNum: this.queryParams.pageNum };
       this.$tab.openPage("修改[" + tableName + "]生成配置", '/tool/gen-edit/index/' + tableId, params);
     },
+    /*
+    删除按钮操作
+     */
     /** 删除按钮操作 */
     handleDelete(row) {
       const tableIds = row.tableId || this.ids;

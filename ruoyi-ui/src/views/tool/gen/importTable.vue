@@ -1,5 +1,7 @@
 <template>
-  <!-- 导入表 -->
+  <!--
+  导入表
+  -->
   <el-dialog title="导入表" :visible.sync="visible" width="800px" top="5vh" append-to-body>
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true">
       <el-form-item label="表名称" prop="tableName">
@@ -39,6 +41,9 @@
         @pagination="getList"
       />
     </el-row>
+<!--
+  按钮
+-->
     <div slot="footer" class="dialog-footer">
       <el-button type="primary" @click="handleImportTable">确 定</el-button>
       <el-button @click="visible = false">取 消</el-button>
@@ -47,8 +52,17 @@
 </template>
 
 <script>
+/*
+  引入外部组件
+ */
 import { listDbTable, importTable } from "@/api/tool/gen";
+/*
+导出本组件的数据
+ */
 export default {
+  /*
+  本组件的参数数据
+   */
   data() {
     return {
       // 遮罩层
@@ -74,6 +88,7 @@ export default {
       this.getList();
       this.visible = true;
     },
+    //实现点击行时的功能
     clickRow(row) {
       this.$refs.table.toggleRowSelection(row);
     },
@@ -90,16 +105,25 @@ export default {
         }
       });
     },
+    /*
+    搜索按钮操作,实现搜索功能
+     */
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /*
+    重置按钮功能的实现
+     */
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    /*
+    导入按钮操作
+     */
     /** 导入按钮操作 */
     handleImportTable() {
       const tableNames = this.tables.join(",");
@@ -107,6 +131,9 @@ export default {
         this.$modal.msgError("请选择要导入的表");
         return;
       }
+      /*
+      导入表格的功能实现
+       */
       importTable({ tables: tableNames }).then(res => {
         this.$modal.msgSuccess(res.msg);
         if (res.code === 200) {

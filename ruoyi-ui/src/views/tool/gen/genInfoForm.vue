@@ -1,4 +1,8 @@
 <template>
+
+<!--
+  用于填写生成代码条件的表单展示
+-->
   <el-form ref="genInfoForm" :model="info" :rules="rules" label-width="150px">
     <el-row>
       <el-col :span="12">
@@ -214,11 +218,23 @@
 </template>
 
 <script>
+/*
+引入外部资源
+ */
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
+/*
+导出该组件的资源
+ */
 export default {
+  /*
+  使用的组件
+   */
   components: { Treeselect },
+  /*
+  用户接收外部组件传来的数据，用于组件交互
+   */
   props: {
     info: {
       type: Object,
@@ -233,9 +249,15 @@ export default {
       default: []
     },
   },
+  /*
+  该组件自己的参数数据
+   */
   data() {
     return {
       subColumns: [],
+      /*
+      提示信息的集合
+       */
       rules: {
         tplCategory: [
           { required: true, message: "请选择生成模板", trigger: "blur" }
@@ -255,13 +277,25 @@ export default {
       }
     };
   },
+  /*
+  created函数，无内容
+   */
   created() {},
+  /*
+  监视函数，用来监视参数变化
+   */
   watch: {
     'info.subTableName': function(val) {
       this.setSubTableColumns(val);
     }
   },
+  /*
+  该组件的方法集合
+   */
   methods: {
+    /*
+    转换菜单数据结构
+     */
     /** 转换菜单数据结构 */
     normalizer(node) {
       if (node.children && !node.children.length) {
@@ -273,10 +307,16 @@ export default {
         children: node.children
       };
     },
+    /*
+    选择子表名触发
+     */
     /** 选择子表名触发 */
     subSelectChange(value) {
       this.info.subTableFkName = '';
     },
+    /*
+    选择生成模板触发
+     */
     /** 选择生成模板触发 */
     tplSelectChange(value) {
       if(value !== 'sub') {
@@ -284,6 +324,9 @@ export default {
         this.info.subTableFkName = '';
       }
     },
+    /*
+    设置关联外键
+     */
     /** 设置关联外键 */
     setSubTableColumns(value) {
       for (var item in this.tables) {

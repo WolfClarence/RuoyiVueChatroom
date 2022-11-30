@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+<!--
+  查询表单
+-->
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="岗位编码" prop="postCode">
         <el-input
@@ -78,7 +81,9 @@
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
-
+<!--
+  列表展示
+-->
     <el-table v-loading="loading" :data="postList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="岗位编号" align="center" prop="postId" />
@@ -123,6 +128,9 @@
       @pagination="getList"
     />
 
+<!--
+  添加或修改岗位对话框
+-->
     <!-- 添加或修改岗位对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
@@ -157,11 +165,23 @@
 </template>
 
 <script>
+/*
+引入外部资源
+ */
 import { listPost, getPost, delPost, addPost, updatePost } from "@/api/system/post";
 
 export default {
+  /*
+    该组件的名字
+  */
   name: "Post",
+  /*
+  vue字典
+   */
   dicts: ['sys_normal_disable'],
+  /*
+  数据集合
+   */
   data() {
     return {
       // 遮罩层
@@ -190,42 +210,84 @@ export default {
         postName: undefined,
         status: undefined
       },
+      /*
+      表单的参数，用来接收传来的表单信息
+       */
       // 表单参数
       form: {},
+      /*
+      针对表单参数的校验
+       */
       // 表单校验
       rules: {
+        /*
+        关于岗位名字
+         */
         postName: [
           { required: true, message: "岗位名称不能为空", trigger: "blur" }
         ],
+        /*
+        关于岗位编码
+         */
         postCode: [
           { required: true, message: "岗位编码不能为空", trigger: "blur" }
         ],
+        /*
+        关于岗位顺序
+         */
         postSort: [
           { required: true, message: "岗位顺序不能为空", trigger: "blur" }
         ]
       }
     };
   },
+  /*
+  生命周期钩子，在组件初始化时 执行此内容。实现提前查询岗位列表
+   */
   created() {
     this.getList();
   },
   methods: {
+    /*
+    查询岗位的列表
+     */
     /** 查询岗位列表 */
     getList() {
+      /*
+      将该组件中的loading参数置为true
+       */
       this.loading = true;
+      /*
+      函数的执行，实现向后台发送post请求
+       */
       listPost(this.queryParams).then(response => {
         this.postList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
     },
+    /*
+    取消按钮的功能实现
+     */
     // 取消按钮
     cancel() {
+      /*
+      将该组件中的open参数的值置为false
+       */
       this.open = false;
+      /*
+      执行reset方法
+       */
       this.reset();
     },
+    /*
+    实现表单内容的重置
+     */
     // 表单重置
     reset() {
+      /*
+      重新设置form参数对象众多的数值
+       */
       this.form = {
         postId: undefined,
         postCode: undefined,
@@ -234,30 +296,48 @@ export default {
         status: "0",
         remark: undefined
       };
+      /*
+      执行resetForm函数
+       */
       this.resetForm("form");
     },
+    /*
+    搜索按键功能的实现
+     */
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
       this.getList();
     },
+    /*
+    重置按键的功能实现
+     */
     /** 重置按钮操作 */
     resetQuery() {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    /*
+    处理多选框中的数据
+     */
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.postId)
       this.single = selection.length!=1
       this.multiple = !selection.length
     },
+    /*
+    处理新增按钮的功能实现
+     */
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
       this.title = "添加岗位";
     },
+    /*
+    修改按钮功能的实现
+     */
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
@@ -268,11 +348,17 @@ export default {
         this.title = "修改岗位";
       });
     },
+    /*
+    提交按钮功能的实现
+     */
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.postId != undefined) {
+            /*
+            发送post请求给后端以实现在后端的修改
+             */
             updatePost(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
@@ -288,6 +374,9 @@ export default {
         }
       });
     },
+    /*
+    实现删除按钮
+     */
     /** 删除按钮操作 */
     handleDelete(row) {
       const postIds = row.postId || this.ids;
@@ -298,6 +387,9 @@ export default {
         this.$modal.msgSuccess("删除成功");
       }).catch(() => {});
     },
+    /*
+    导出按钮的功能呢实现
+     */
     /** 导出按钮操作 */
     handleExport() {
       this.download('system/post/export', {
