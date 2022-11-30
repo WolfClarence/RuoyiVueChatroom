@@ -82,10 +82,16 @@ public class BaseController
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected TableDataInfo getDataTable(List<?> list)
     {
+        //将信息封装后返回
         TableDataInfo rspData = new TableDataInfo();
+
+        //设置响应状态码
         rspData.setCode(HttpStatus.SUCCESS);
+        //设置操作提醒
         rspData.setMsg("查询成功");
+        //添加list列表数据
         rspData.setRows(list);
+        //获取总记录数目
         rspData.setTotal(new PageInfo(list).getTotal());
         return rspData;
     }
