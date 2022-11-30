@@ -13,6 +13,13 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 此类可对应左侧系统管理中的参数设置功能的基本类
+ * BaseEntity类在com.ruoyi.common.core.domain中，BaseEntity implements Serializable以实现具体对象的序列化
+ * SysConfig extends BaseEntity 以实现具体对象的序列化，方便数据在网络传输
+ */
 public class SysConfig extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -92,7 +99,8 @@ public class SysConfig extends BaseEntity
     {
         this.configType = configType;
     }
-    
+
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)

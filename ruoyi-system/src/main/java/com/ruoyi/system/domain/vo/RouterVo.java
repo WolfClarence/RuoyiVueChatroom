@@ -8,6 +8,12 @@ import java.util.List;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 将该标记放在属性上，如果该属性为空字符串或者为null则都不参与序列化 。如果放在类上边,那对这个类的全部属性起作用
+ * NON_EMPTY // null、集合数组等没有内容、空字符串等，都不会被序列化
+ */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RouterVo
 {

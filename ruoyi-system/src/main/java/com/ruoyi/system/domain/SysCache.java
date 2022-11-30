@@ -7,6 +7,12 @@ import com.ruoyi.common.utils.StringUtils;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 缓存信息类，包括构造方法，get，set方法
+ * 此类对应系统监控中的缓存列表功能
+ */
 public class SysCache
 {
     /** 缓存名称 */

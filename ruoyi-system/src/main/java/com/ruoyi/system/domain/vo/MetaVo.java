@@ -12,10 +12,20 @@ public class MetaVo
     /**
      * 设置该路由在侧边栏和面包屑中展示的名字
      */
+
+    /**
+     * cxy
+     *主页最左侧功能栏的功能名字
+     */
     private String title;
 
     /**
      * 设置该路由的图标，对应路径src/assets/icons/svg
+     */
+
+    /**
+     * cxy
+     *主页最左侧功能栏的功能图标
      */
     private String icon;
 
@@ -29,6 +39,10 @@ public class MetaVo
      */
     private String link;
 
+    /**
+     * cxy
+     *构造函数
+     */
     public MetaVo()
     {
     }

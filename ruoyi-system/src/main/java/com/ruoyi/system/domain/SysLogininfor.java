@@ -11,6 +11,11 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ *此类对应系统管理日志管理中登录日志
+ */
 public class SysLogininfor extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

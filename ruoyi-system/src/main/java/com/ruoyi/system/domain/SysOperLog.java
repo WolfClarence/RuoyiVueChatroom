@@ -11,6 +11,11 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
+
+/**
+ * cxy
+ * 对应系统管理，日志管理登录日志中的操作日志功能
+ */
 public class SysOperLog extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
