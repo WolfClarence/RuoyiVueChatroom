@@ -9,6 +9,13 @@ import com.ruoyi.common.core.domain.entity.SysDept;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释
+ * @author Mxkun
+ * 与部门相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
 public interface SysDeptMapper
 {
     /**
@@ -17,7 +24,7 @@ public interface SysDeptMapper
      * @param dept 部门信息
      * @return 部门信息集合
      */
-    public List<SysDept> selectDeptList(SysDept dept);
+    public List<SysDept> selectDeptList(SysDept dept);//根据多种信息查询多个部分，并根据ID与Num升序排序
 
     /**
      * 根据角色ID查询部门树信息
@@ -75,7 +82,9 @@ public interface SysDeptMapper
      * @param parentId 父部门ID
      * @return 结果
      */
+    //提供部门名称和父部门的ID，查询到一条数据便停止查询，查询结果不为空，则名称不唯一。
     public SysDept checkDeptNameUnique(@Param("deptName") String deptName, @Param("parentId") Long parentId);
+
 
     /**
      * 新增部门信息
@@ -106,7 +115,7 @@ public interface SysDeptMapper
      * @param depts 子元素
      * @return 结果
      */
-    public int updateDeptChildren(@Param("depts") List<SysDept> depts);
+    public int updateDeptChildren(@Param("depts") List<SysDept> depts);//提供新的子部门集合，重新修改子部门
 
     /**
      * 删除部门管理信息

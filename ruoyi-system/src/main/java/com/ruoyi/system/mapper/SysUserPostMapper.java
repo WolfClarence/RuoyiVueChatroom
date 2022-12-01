@@ -8,6 +8,13 @@ import com.ruoyi.system.domain.SysUserPost;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释
+ * @author Mxkun
+ * 与用户与岗位关联表相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
 public interface SysUserPostMapper
 {
     /**
