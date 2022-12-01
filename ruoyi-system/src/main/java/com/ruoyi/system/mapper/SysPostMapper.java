@@ -94,7 +94,7 @@ public interface SysPostMapper
      * @param postName 岗位名称
      * @return 结果
      */
-    public SysPost checkPostNameUnique(String postName);
+    public SysPost checkPostNameUnique(String postName);//查询校验岗位名称是否唯一
 
     /**
      * 校验岗位编码
@@ -102,5 +102,5 @@ public interface SysPostMapper
      * @param postCode 岗位编码
      * @return 结果
      */
-    public SysPost checkPostCodeUnique(String postCode);
+    public SysPost checkPostCodeUnique(String postCode);//查询校验岗位编码是否唯一
 }

@@ -20,10 +20,11 @@ public interface SysDictDataMapper
 {
     /**
      * 根据条件分页查询字典数据
-     * 
+     *
      * @param dictData 字典数据信息
      * @return 字典数据集合信息
      */
+
     public List<SysDictData> selectDictDataList(SysDictData dictData);
 
     /**
@@ -41,7 +42,7 @@ public interface SysDictDataMapper
      * @param dictValue 字典键值
      * @return 字典标签
      */
-    public String selectDictLabel(@Param("dictType") String dictType, @Param("dictValue") String dictValue);
+    public String selectDictLabel(@Param("dictType") String dictType, @Param("dictValue") String dictValue);//查找同时符合两种条件的字典数据
 
     /**
      * 根据字典数据ID查询信息
@@ -98,5 +99,5 @@ public interface SysDictDataMapper
      * @param newDictType 新旧字典类型
      * @return 结果
      */
-    public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);
+    public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);//查找oldDictType的字典数据，将其改为newDictType
 }

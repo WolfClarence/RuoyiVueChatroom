@@ -45,5 +45,5 @@ public interface SysLogininforMapper
      * 
      * @return 结果
      */
-    public int cleanLogininfor();
+    public int cleanLogininfor();//通过truncate命令删除表中所有数据
 }

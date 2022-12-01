@@ -24,6 +24,12 @@ public interface SysUserMapper
      * @param sysUser 用户信息
      * @return 用户信息集合信息
      */
+    /*
+      分页功能通过${params.dataScope}实现，params是一个属性，存在于SysRole继承的BaseEntity基类中，
+      在Service业务层实现类中通过自定义注解@DataScope使用，两个字段为d，p数据库别名,
+      由切面类DataScopeAspect根据角色类型生成动态sql，
+      进行数据范围过滤（也就是说控制一个用户，能看到的数据有哪些）
+     */
     public List<SysUser> selectUserList(SysUser sysUser);
 
     /**
