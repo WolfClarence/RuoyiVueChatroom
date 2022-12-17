@@ -4,6 +4,7 @@
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened"  @close="closeDialog">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
+          <!--vue-cropper是一个可以进行图片剪辑的插件-->
           <vue-cropper
             ref="cropper"
             :img="options.img"
@@ -18,12 +19,14 @@
           />
         </el-col>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
+          <!--是ruoyi.scss中的样式，用于预览upload-->
           <div class="avatar-upload-preview">
             <img :src="previews.url" :style="previews.img" />
           </div>
         </el-col>
       </el-row>
       <br />
+      <!--一行图标，拥有特定功能-->
       <el-row>
         <el-col :lg="2" :sm="3" :xs="3">
           <el-upload action="#" :http-request="requestUpload" :show-file-list="false" :before-upload="beforeUpload">
@@ -92,6 +95,7 @@ export default {
       this.open = true;
     },
     // 打开弹出层结束时的回调
+    // 打开弹出层结束时使用utils包下的index.js里面的debounce方法，进行刷新，并且添加一个事件监听器
     modalOpened() {
       this.visible = true;
       if (!this.resizeHandler) {
@@ -122,6 +126,7 @@ export default {
       this.$refs.cropper.changeScale(num);
     },
     // 上传预处理
+    //规定了上传文件的格式，并且以dataurl的方式读取
     beforeUpload(file) {
       if (file.type.indexOf("image/") == -1) {
         this.$modal.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
@@ -134,6 +139,7 @@ export default {
       }
     },
     // 上传图片
+    //使用user.js中的uploadAvatar进行用户头像上传
     uploadImg() {
       this.$refs.cropper.getCropBlob(data => {
         let formData = new FormData();

@@ -1,8 +1,9 @@
 <template>
+  <!--一个表单，其中有用户昵称，手机号码，邮箱，性别这些需要填写-->
   <el-form ref="form" :model="user" :rules="rules" label-width="80px">
     <el-form-item label="用户昵称" prop="nickName">
       <el-input v-model="user.nickName" maxlength="30" />
-    </el-form-item> 
+    </el-form-item>
     <el-form-item label="手机号码" prop="phonenumber">
       <el-input v-model="user.phonenumber" maxlength="11" />
     </el-form-item>
@@ -58,6 +59,7 @@ export default {
     };
   },
   methods: {
+    //如果表单数据合法，使用后端接口，修改用户个人信息
     submit() {
       this.$refs["form"].validate(valid => {
         if (valid) {
@@ -67,6 +69,7 @@ export default {
         }
       });
     },
+    //关闭页面
     close() {
       this.$tab.closePage();
     }

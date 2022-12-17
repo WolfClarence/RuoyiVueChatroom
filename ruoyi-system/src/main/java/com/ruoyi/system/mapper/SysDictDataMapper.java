@@ -9,14 +9,22 @@ import com.ruoyi.common.core.domain.entity.SysDictData;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释
+ * @author Mxkun
+ * 与字典数据相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
 public interface SysDictDataMapper
 {
     /**
      * 根据条件分页查询字典数据
-     * 
+     *
      * @param dictData 字典数据信息
      * @return 字典数据集合信息
      */
+
     public List<SysDictData> selectDictDataList(SysDictData dictData);
 
     /**
@@ -34,7 +42,7 @@ public interface SysDictDataMapper
      * @param dictValue 字典键值
      * @return 字典标签
      */
-    public String selectDictLabel(@Param("dictType") String dictType, @Param("dictValue") String dictValue);
+    public String selectDictLabel(@Param("dictType") String dictType, @Param("dictValue") String dictValue);//查找同时符合两种条件的字典数据
 
     /**
      * 根据字典数据ID查询信息
@@ -91,5 +99,5 @@ public interface SysDictDataMapper
      * @param newDictType 新旧字典类型
      * @return 结果
      */
-    public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);
+    public int updateDictDataType(@Param("oldDictType") String oldDictType, @Param("newDictType") String newDictType);//查找oldDictType的字典数据，将其改为newDictType
 }

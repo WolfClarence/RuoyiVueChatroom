@@ -8,6 +8,13 @@ import com.ruoyi.system.domain.SysConfig;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释
+ * @author Mxkun
+ * 参数配置相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
 public interface SysConfigMapper
 {
     /**
@@ -16,7 +23,7 @@ public interface SysConfigMapper
      * @param config 参数配置信息
      * @return 参数配置信息
      */
-    public SysConfig selectConfig(SysConfig config);
+    public SysConfig selectConfig(SysConfig config);//根据提供的config_id与config_key查询符合条件的参数配置
 
     /**
      * 查询参数配置列表
@@ -24,7 +31,7 @@ public interface SysConfigMapper
      * @param config 参数配置信息
      * @return 参数配置集合
      */
-    public List<SysConfig> selectConfigList(SysConfig config);
+    public List<SysConfig> selectConfigList(SysConfig config);//可根据多种条件查询多个参数配置
 
     /**
      * 根据键名查询参数配置信息

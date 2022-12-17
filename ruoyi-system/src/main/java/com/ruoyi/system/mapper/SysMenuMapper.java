@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysMenu;
 
@@ -9,8 +10,15 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
  *
  * @author ruoyi
  */
-public interface SysMenuMapper
-{
+
+/**
+ * 详细注释
+ *
+ * @author Mxkun
+ * 与菜单相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
+public interface SysMenuMapper {
     /**
      * 查询系统菜单列表
      *
@@ -36,7 +44,7 @@ public interface SysMenuMapper
 
     /**
      * 根据角色ID查询权限
-     * 
+     *
      * @param roleId 角色ID
      * @return 权限列表
      */
@@ -67,8 +75,8 @@ public interface SysMenuMapper
 
     /**
      * 根据角色ID查询菜单树信息
-     * 
-     * @param roleId 角色ID
+     *
+     * @param roleId            角色ID
      * @param menuCheckStrictly 菜单树选择项是否关联显示
      * @return 选中菜单列表
      */
@@ -88,7 +96,7 @@ public interface SysMenuMapper
      * @param menuId 菜单ID
      * @return 结果
      */
-    public int hasChildByMenuId(Long menuId);
+    public int hasChildByMenuId(Long menuId);//查询菜单子节点数量
 
     /**
      * 新增菜单信息

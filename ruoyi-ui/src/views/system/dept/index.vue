@@ -57,6 +57,7 @@
     </el-row>
 
     <!--表格展示部门数据-->
+    <!--v-loading与data中的loading绑定，即可展示加载中的动画-->
     <el-table
       v-if="refreshTable"
       v-loading="loading"
@@ -289,7 +290,7 @@ export default {
       this.handleQuery();
     },
     /** 新增按钮操作 */
-    //表单重置，弹出一个对话框，把修改标题等属性，并且请求它的上级菜单
+    //表单重置，弹出一个对话框，修改标题等属性，并且请求它的上级菜单
     handleAdd(row) {
       this.reset();
       if (row != undefined) {
@@ -311,7 +312,7 @@ export default {
       });
     },
     /** 修改按钮操作 */
-    //表单重置，弹出一个对话框，把修改标题等属性，并且请求它的上级菜单（除去自己）
+    //表单重置，弹出一个对话框，修改标题等属性，并且请求它的上级菜单（除去自己）
     handleUpdate(row) {
       this.reset();
       getDept(row.deptId).then(response => {

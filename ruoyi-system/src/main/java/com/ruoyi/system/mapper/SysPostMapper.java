@@ -8,6 +8,13 @@ import com.ruoyi.system.domain.SysPost;
  * 
  * @author ruoyi
  */
+
+/**
+ * 详细注释
+ * @author Mxkun
+ * 与岗位信息相关的数据库操作
+ * 与数据库连接的Mapper层接口，在编译的时候动态生成代理类，实现数据库查询功能
+ */
 public interface SysPostMapper
 {
     /**
@@ -87,7 +94,7 @@ public interface SysPostMapper
      * @param postName 岗位名称
      * @return 结果
      */
-    public SysPost checkPostNameUnique(String postName);
+    public SysPost checkPostNameUnique(String postName);//查询校验岗位名称是否唯一
 
     /**
      * 校验岗位编码
@@ -95,5 +102,5 @@ public interface SysPostMapper
      * @param postCode 岗位编码
      * @return 结果
      */
-    public SysPost checkPostCodeUnique(String postCode);
+    public SysPost checkPostCodeUnique(String postCode);//查询校验岗位编码是否唯一
 }

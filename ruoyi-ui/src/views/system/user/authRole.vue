@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <h4 class="form-header h4">基本信息</h4>
+    <!--显示基本信息的表格，包含用户昵称，登录账号-->
     <el-form ref="form" :model="form" label-width="80px">
       <el-row>
         <el-col :span="8" :offset="2">
@@ -17,6 +18,7 @@
     </el-form>
 
     <h4 class="form-header h4">角色信息</h4>
+    <!--显示角色信息的表格，包含序号，角色编号，角色名称，权限字符，创建时间-->
     <el-table v-loading="loading" :row-key="getRowKey" @row-click="clickRow" ref="table" @selection-change="handleSelectionChange" :data="roles.slice((pageNum-1)*pageSize,pageNum*pageSize)">
       <el-table-column label="序号" type="index" align="center">
         <template slot-scope="scope">
@@ -33,7 +35,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination v-show="total>0" :total="total" :page.sync="pageNum" :limit.sync="pageSize" />
 
     <el-form label-width="100px">
@@ -66,6 +68,7 @@ export default {
       form: {}
     };
   },
+  //初始化，使用user.js中的getAuthRole查询授权角色，把获得的数据存到data里
   created() {
     const userId = this.$route.params && this.$route.params.userId;
     if (userId) {
@@ -87,6 +90,7 @@ export default {
   },
   methods: {
     /** 单击选中行数据 */
+    //使用element-ui中table自带的toggleRowSelection方法选中行数据
     clickRow(row) {
       this.$refs.table.toggleRowSelection(row);
     },
@@ -99,6 +103,7 @@ export default {
       return row.roleId;
     },
     /** 提交按钮 */
+    //使用后端接口更新authRole
     submitForm() {
       const userId = this.form.userId;
       const roleIds = this.roleIds.join(",");
@@ -108,6 +113,7 @@ export default {
       });
     },
     /** 关闭按钮 */
+    //关闭页面
     close() {
       const obj = { path: "/system/user" };
       this.$tab.closeOpenPage(obj);
