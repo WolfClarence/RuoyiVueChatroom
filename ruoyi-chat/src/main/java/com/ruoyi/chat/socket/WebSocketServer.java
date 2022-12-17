@@ -1,4 +1,4 @@
-package com.ruoyi.chat.component;
+package com.ruoyi.chat.socket;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @ClassName WebSocketServer
  * @Description:
  */
-@ServerEndpoint(value = "/chat/imserver/{username}")
+@ServerEndpoint(value = "/chat/myServer/{username}")
 @Component
 public class WebSocketServer {
     /**
@@ -96,7 +96,7 @@ public class WebSocketServer {
      *     当服务器收到客户发送来的一个消息后，便调用该方法，用以处理和中转用户发送的消息
      */
     @OnMessage
-    public void onMessage(String message,Session session,@PathParam("username")String username){
+    public void onMessage(String message,@PathParam("username")String username){
         logger.info("服务器收到用户username={}发送来的消息：{}" ,username,message);
         JSONObject jsonObject = JSONUtil.parseObj(message);
         String destinationUsername = jsonObject.getStr("to");//目标用户名

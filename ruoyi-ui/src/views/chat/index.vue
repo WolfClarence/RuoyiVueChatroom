@@ -3,12 +3,22 @@
     <el-row>
       <el-col :span="4">
         <el-card style="width: 300px; height: 300px; color: #333">
+          <div v-if="user.username!=''">
+            用户昵称： {{user.username}}
+          </div>
+          <div style="color: red;" v-else>
+            未连接
+          </div>
           <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">在线用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span></div>
+          <span>世界聊天</span>
+          <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
+             @click="intoWorld()"></i>
+          <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="isInWorld">world-chat click again to leave</span>
           <div style="padding: 10px 0" v-for="user in users" :key="user.username">
             <span>{{ user.username }}</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
-               @click="chatUser = user.username"></i>
-            <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="user.username === chatUser">chatting...</span>
+               @click="switchFriend(user.username)"></i>
+            <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="user.username === chatUser&&isInWorld==false">chatting...</span>
           </div>
         </el-card>
       </el-col>
@@ -16,15 +26,19 @@
         <div style="width: 800px; margin: 0 auto; background-color: white;
                     border-radius: 5px; box-shadow: 0 0 10px #ccc">
           <div style="text-align: center; line-height: 50px;">
-            Web聊天室（{{ chatUser }}）
+            Web聊天室（{{isInWorld?'世界聊天': chatUser }}）
           </div>
-          <div style="height: 350px; overflow:auto; border-top: 1px solid #ccc" v-html="content"></div>
+          <div id="main" style="height: 350px; overflow:auto; border-top: 1px solid #ccc" v-html="content"></div>
           <div style="height: 200px">
             <textarea v-model="text" style="height: 160px; width: 100%; padding: 20px; border: none; border-top: 1px solid #ccc;
              border-bottom: 1px solid #ccc; outline: none"></textarea>
             <div style="text-align: right; padding-right: 10px">
               <el-button type="primary" size="mini" @click="send">发送</el-button>
             </div>
+            <input v-model="inputUsername"/>
+            <el-button type="primary" size="mini" @click="linking">连接</el-button>
+            <p style="color: blue;" v-if="isLinked">已连接</p>
+            <p style="color:red;" v-else>未连接</p>
           </div>
         </div>
       </el-col>
@@ -32,46 +46,113 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
+axios.defaults.baseURL='http://localhost:8080';
 let socket;
 export default {
-  name: "Chat",
+  name: "Im",
   data() {
     return {
-      circleUrl: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=700&q=60',
-      user: {},
-      isCollapse: false,
+      user: {
+        username:''
+      },//当前用户
+      isLinked: false,
+      isInWorld: false,
+      inputUsername : "",
       users: [],
-      chatUser: '',
-      text: "",
-      messages: [],
-      content: ''
+      chatUser: '',//交谈的对象
+      text: "",//发送的信息文本
+      messages: [],//发送的信息内容
+      content: '',// 框内显示的内容
     }
   },
-  created() {
-    this.init()
-  },
+
   methods: {
-    send() {
-      if (!this.chatUser) {
-        this.$message({type: 'warning', message: "请选择聊天对象"})
-        return;
-      }
-      if (!this.text) {
-        this.$message({type: 'warning', message: "请输入内容"})
-      } else {
-        if (typeof (WebSocket) == "undefined") {
-          console.log("您的浏览器不支持WebSocket");
-        } else {
-          console.log("您的浏览器支持WebSocket");
-          // 组装待发送的消息 json
-          // {"from": "zhang", "to": "admin", "text": "聊天文本"}
-          let message = {from: this.user.username, to: this.chatUser, text: this.text}
-          socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
-          this.messages.push({user: this.user.username, text: this.text})
-          // 构建消息内容，本人消息
-          this.createContent(null, this.user.username, this.text)
-          this.text = '';
+    intoWorld(){
+      console.log('intoWorld')
+      if(this.isLinked){
+        if(this.isInWorld===false){
+          this.isInWorld = true;
+          axios("/chat/hello").then(res=>{
+            this.content = ''
+            res.data.forEach(element => {
+              console.log(element.username,element.text)
+              if(element.username===this.user.username){
+                this.createContent(null,element.username,element.text)
+              }else{
+                this.createContent(element.username,null,element.text)
+              }
+
+            });
+            this.updateScroll();
+          })
+          // this.updateScroll();//此函数必须和dom变化紧挨着
+          this.Interval = setInterval(()=>{
+            axios("/chat/hello").then(res=>{
+              this.content = '';
+              res.data.forEach(element => {
+                console.log(element.username,element.text)
+                if(element.username==this.user.username){
+                  this.createContent(null,element.username,element.text)
+                }else{
+                  this.createContent(element.username,null,element.text)
+                }
+              });
+              this.updateScroll();
+            })
+          },2000);
+        }else{
+          this.isInWorld = false;
+          this.content = '';
+          clearInterval(this.Interval);
         }
+
+      }else{
+        window.alert("请先连接，连接后才能进入世界大厅哟")
+      }
+
+    },
+    switchFriend(username){
+      console.log('switchFriend')
+      this.chatUser = username;
+      this.content = '';
+    },
+    send() {
+      if(this.isInWorld==false){//私聊发送按钮
+        if (!this.chatUser) {
+          this.$message({type: 'warning', message: "请选择聊天对象"})
+          return;
+        }
+        if (!this.text) {
+          this.$message({type: 'warning', message: "请输入内容"})
+        } else {
+          if (typeof (WebSocket) == "undefined") {
+            console.log("您的浏览器不支持WebSocket");
+          } else {
+            console.log("您的浏览器支持WebSocket");
+            // 组装待发送的消息 json
+            // {"from": "zhang", "to": "admin", "text": "聊天文本"}
+            let message = {from: this.user.username, to: this.chatUser, text: this.text}
+            socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
+            this.messages.push({user: this.user.username, text: this.text})
+            // 构建消息内容，本人消息
+            this.createContent(null, this.user.username, this.text)
+            this.text = '';
+          }
+        }
+      }else{//世界大厅发送按钮
+        // 构建消息内容，本人消息
+        this.createContent(null, this.user.username, this.text)
+        let username = this.user.username;
+        let text = this.text;
+        axios.post("/chat/add",{
+          "username":username,
+          "text":text,
+        }).then(res=>{
+          console.log(res.data)
+        }).catch(e=>{})
+        this.text = '';
+        this.updateScroll();
       }
     },
     createContent(remoteUser, nowUser, text) {  // 这个方法是用来将 json的聊天消息数据转换成 html的。
@@ -79,8 +160,8 @@ export default {
       // 当前用户消息
       if (nowUser) { // nowUser 表示是否显示当前用户发送的聊天消息，绿色气泡
         html = "<div class=\"el-row\" style=\"padding: 5px 0\">\n" +
-          "  <div class=\"el-col el-col-22\" style=\"text-align: right; padding-right: 10px\">\n" +
-          "    <div class=\"tip left\">" + text + "</div>\n" +
+          "  <div class=\"el-col el-col-22\" style=\"text-align: right;\">\n" +
+          "  <div style=\"font-size:15px;color:black;background-color:white; \" class=\"left\">" + nowUser + "</div>  <div class=\"tip left\">" + text + "</div>\n" +
           "  </div>\n" +
           "  <div class=\"el-col el-col-2\">\n" +
           "  <span class=\"el-avatar el-avatar--circle\" style=\"height: 40px; width: 40px; line-height: 40px;\">\n" +
@@ -95,60 +176,76 @@ export default {
           "    <img src=\"https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png\" style=\"object-fit: cover;\">\n" +
           "  </span>\n" +
           "  </div>\n" +
-          "  <div class=\"el-col el-col-22\" style=\"text-align: left; padding-left: 10px\">\n" +
-          "    <div class=\"tip right\">" + text + "</div>\n" +
+          "  <div class=\"el-col el-col-22\" style=\"text-align: left;\">\n" +
+          "    <div style=\"font-size:15px;background-color:white;\" class=\"right\">" + remoteUser + "</div><div class=\"tip right\">" + text + "</div>\n" +
           "  </div>\n" +
           "</div>";
       }
       console.log(html)
       this.content += html;
     },
-    init() {
-      this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {}
-      let username ='ID为' + (Math.ceil(Math.random()*100000)+600000 )+'的用户';
-      this.user.username= username;
-      let _this = this;
-      if (typeof (WebSocket) == "undefined") {
-        console.log("您的浏览器不支持WebSocket");
-      } else {
-        console.log("您的浏览器支持WebSocket");
-        let socketUrl = "ws://localhost:8080/chat/imserver/" + username;
-        if (socket != null) {
-          socket.close();
-          socket = null;
-        }
-        // 开启一个websocket服务
-        socket = new WebSocket(socketUrl);
-        //打开事件
-        socket.onopen = function () {
-          console.log("websocket已打开");
-        };
-        //  浏览器端收消息，获得从服务端发送过来的文本消息
-        socket.onmessage = function (msg) {
-          console.log("收到数据====" + msg.data)
-          let data = JSON.parse(msg.data)  // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
-          if (data.users) {  // 获取在线人员信息
-            _this.users = data.users.filter(user => user.username !== username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
-          } else {
-            // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
-            //  // {"from": "zhang", "text": "hello"}
-            if (data.from === _this.chatUser) {
-              _this.messages.push(data)
-              // 构建消息内容
-              _this.createContent(data.from, null, data.text)
-            }
+    linking() {
+      console.log("linking")
+      if(this.user.username!==''){
+        window.alert("您已经连接了亲，您的用户名是: "+this.user.username)
+      }else if(this.inputUsername!==''){
+        this.user.username = this.inputUsername;
+        this.isLinked = true;
+        let _this = this;
+        if (typeof (WebSocket) == "undefined") {
+          console.log("您的浏览器不支持WebSocket");
+        } else {
+          console.log("您的浏览器支持WebSocket");
+          let socketUrl = "ws://localhost:8080/chat/myServer/" + this.user.username;
+          if (socket != null) {
+            socket.close();
+            socket = null;
           }
-        };
-        //关闭事件
-        socket.onclose = function () {
-          console.log("websocket已关闭");
-        };
-        //发生了错误事件
-        socket.onerror = function () {
-          console.log("websocket发生了错误");
+          // 开启一个websocket服务
+          socket = new WebSocket(socketUrl);
+          this.handleSocket(socket,_this);
         }
+      }else{
+        window.alert("请输入用户名呀亲，不输入是没法连接的哟")
       }
+    },
+    handleSocket(socket,_this){
+      //打开事件
+      socket.onopen = function () {
+        console.log("websocket已打开");
+      };
+      //  浏览器端收消息，获得从服务端发送过来的文本消息
+      socket.onmessage = function (msg) {
+        console.log("收到数据====" + msg.data)
+        let data = JSON.parse(msg.data)  // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
+        if (data.users) {  // 获取在线人员信息
+          _this.users = data.users.filter(user => user.username !== _this.user.username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
+        } else {
+          // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
+          //  // {"from": "zhang", "text": "hello"}
+          if (data.from === _this.chatUser) {
+            // _this.messages.push(data)//不做消息保存
+            // 构建消息内容
+            _this.createContent(data.from, null, data.text)
+          }
+        }
+      };
+      //关闭事件
+      socket.onclose = function () {
+        console.log("websocket已关闭");
+      };
+      //发生了错误事件
+      socket.onerror = function () {
+        console.log("websocket发生了错误");
+      }
+    },
+    updateScroll(){
+      this.$nextTick(() => {
+        var container = this.$el.querySelector("#main");
+        container.scrollTop = container.scrollHeight;
+      })
     }
+
   }
 }
 </script>
