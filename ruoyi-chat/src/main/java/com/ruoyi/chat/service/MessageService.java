@@ -7,6 +7,7 @@ import com.ruoyi.chat.pojo.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -16,10 +17,11 @@ import java.util.List;
  * @Date 2022/12/17
  * @ClassName MessageService
  * @Description:
+ *      service层
  */
 @Service
 public class MessageService {
-    @Autowired
+    @Resource
     MessageMapper messageMapper;
 
     public List<Message> getAllMessageFromDao() {

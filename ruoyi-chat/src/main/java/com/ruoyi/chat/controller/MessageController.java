@@ -6,6 +6,7 @@ import com.ruoyi.chat.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -20,13 +21,32 @@ import java.util.List;
 @RestController
 @RequestMapping("chat")
 public class MessageController {
-    @Autowired
+
+    /**
+     * <p> 变量描述如下:
+     * @Description:
+     *     service层自动注入
+     */
+    @Resource
     MessageService messageService;
+
+    /**
+     * @author GengXuelong
+     * <p> 函数功能描述如下:
+     * @Description:
+     *     拿到数据库中的所有世界大厅中的聊天记录
+     */
     @RequestMapping("/hello")
     public List<Message> hello(){
         return messageService.getAllMessageFromDao();
     }
 
+    /**
+     * @author GengXuelong
+     * <p> 函数功能描述如下:
+     * @Description:
+     *     将新法言的记录添加至数据库
+     */
     @PostMapping("add")
     public String add(@RequestBody Message message){
         System.out.println(message.getUsername()+"------"+message.getText());

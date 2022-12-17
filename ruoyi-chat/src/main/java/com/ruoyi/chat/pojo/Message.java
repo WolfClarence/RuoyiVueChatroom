@@ -16,6 +16,7 @@ import javax.persistence.Table;
  * @Date 2022/12/17
  * @ClassName Message
  * @Description:
+ *      message表对应的Java实体类
  */
 @Data
 @AllArgsConstructor

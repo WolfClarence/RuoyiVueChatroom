@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2022/12/17
  * @ClassName WebSocketServer
  * @Description:
+ *      socketServer 服务器
  */
 @ServerEndpoint(value = "/chat/myServer/{username}")
 @Component

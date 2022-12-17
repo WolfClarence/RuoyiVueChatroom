@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @Date 2022/12/17
  * @ClassName MessageMapper
  * @Description:
+ *      引入通用Mapper实现对message表的基本操作
  */
 @Mapper
 public interface MessageMapper extends tk.mybatis.mapper.common.Mapper<Message> {
