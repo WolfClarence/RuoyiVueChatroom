@@ -171,6 +171,7 @@ export default {
               // 构建消息内容，本人消息
               this.createContent(null, this.user.username, this.text)
               this.text = '';
+              this.updateScroll();
             }
           }
         } else {//世界大厅发送按钮
