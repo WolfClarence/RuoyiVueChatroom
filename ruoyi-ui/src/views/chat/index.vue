@@ -53,6 +53,7 @@
                   v-if="user.username === chatUser&&isInWorld===false">chatting...</span>
           </div>
         </el-card>
+        <i class="el-icon-setting" @click="openDialog"></i>
       </el-col>
       <el-col :span="20">
         <div style="width: 800px; margin: 0 auto; background-color: white;
@@ -62,7 +63,10 @@
           </div>
           <div id="main" style="height: 350px; overflow:auto; border-top: 1px solid #ccc" v-html="content"></div>
           <div style="height: 200px">
-            <textarea v-model="text" style="margin: 0" @keydown.enter="send"></textarea>
+            <textarea v-if="enterEnabled&&ctrlEnterEnabled" v-model="text" style="margin: 0" @keydown.enter.prevent="send"></textarea>
+            <textarea v-if="enterEnabled&&!ctrlEnterEnabled" v-model="text" style="margin: 0" @keydown.enter.prevent="send"></textarea>
+            <textarea v-if="!enterEnabled&&ctrlEnterEnabled" v-model="text" style="margin: 0" @keydown.ctrl.enter="send" ></textarea>
+            <textarea v-if="!enterEnabled&&!ctrlEnterEnabled" v-model="text" style="margin: 0"></textarea>
             <div style="padding: 0;margin: 0">
               <button class="send-btn" @click="send" style="width: 100%">发送</button>
             </div>
@@ -70,6 +74,13 @@
         </div>
       </el-col>
     </el-row>
+    <el-dialog title="设置" :visible.sync="open" width="600px" append-to-body>
+      <el-checkbox v-model="enterEnabled">enter键发送</el-checkbox>
+      <el-checkbox v-model="ctrlEnterEnabled">ctrl+enter键发送</el-checkbox>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -98,7 +109,11 @@ export default {
       // 框内显示的内容
       content: '',
       //请求聊天的用户的用户名列表
-      requestUsers:[]
+      requestUsers:[],
+      //是否显示配置对话框
+      open:false,
+      enterEnabled:true,
+      ctrlEnterEnabled:false
     }
   },
   computed:{
@@ -333,11 +348,7 @@ export default {
         type: 'success'
       });
       this.requestUsers.push(username)
-      console.log('iiiiiiiiiiiiiii'+this.requestUsers)
-      console.log(this.requestUsers)
-      console.log(this.requestUsers[0])
-      console.log(this.contains(this.requestUsers,'111'))
-      console.log(this.requestUsers[0].trim()===111)
+      console.log('requestUsers放入'+username)
     },
     handleDisconnect(username){
       this.$message({
@@ -347,7 +358,7 @@ export default {
       for (let i = 0; i < this.requestUsers.length; i++) {
         if (this.requestUsers[i]===username){
           this.requestUsers.splice(i,1)
-          console.log('iiiiiiiiiiiiiii'+this.requestUsers)
+          console.log('requestUsers删除'+username)
         }
       }
     },
@@ -367,7 +378,13 @@ export default {
         if(arr[i].trim()===e) return true
       }
       return false
-    }
+    },
+    openDialog(){
+      this.open=true;
+    },
+    cancel() {
+      this.open = false;
+    },
   }
 }
 </script>
