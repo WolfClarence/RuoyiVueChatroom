@@ -16,7 +16,7 @@ import javax.persistence.Table;
  * @Date 2022/12/17
  * @ClassName Message
  * @Description:
- *      message表对应的Java实体类
+ *      message表对应的Java实体类，对应世界聊天大厅中的聊天记录，私聊的记录不经过数据库
  */
 @Data
 @AllArgsConstructor

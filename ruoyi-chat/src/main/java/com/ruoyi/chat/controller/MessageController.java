@@ -16,6 +16,7 @@ import java.util.List;
  * @Date 2022/12/17
  * @ClassName MessageController
  * @Description:
+ *      负责处理关于世界聊天大厅的功能请求
  */
 @CrossOrigin
 @RestController

@@ -12,7 +12,7 @@ import java.io.IOException;
  * @Date 2022/12/18
  * @ClassName EncodingFilter
  * @Description:
- *      自定义的编码过滤器，方每个会话的请求和响应均用utf-8编码
+ *      自定义的编码过滤器，使得每个会话的请求和响应均用utf-8编码
  */
 public class EncodingFilter implements Filter {
     @Override

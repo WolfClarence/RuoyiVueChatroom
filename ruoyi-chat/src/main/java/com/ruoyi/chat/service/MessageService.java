@@ -16,7 +16,7 @@ import java.util.List;
  * @Date 2022/12/17
  * @ClassName MessageService
  * @Description:
- *      service层
+ *      service层，这里都是只处理世界聊天大厅的需求
  */
 @Service
 public class MessageService {

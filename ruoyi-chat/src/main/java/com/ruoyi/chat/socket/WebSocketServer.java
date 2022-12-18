@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2022/12/17
  * @ClassName WebSocketServer
  * @Description:
- *      socketServer 服务器
+ *      socketServer服务器，借助socket机制来实现用户之间的私聊聊天
  */
 @ServerEndpoint(value = "/chat/myServer/{username}")
 @Component
@@ -45,20 +45,14 @@ public class WebSocketServer {
      * <p> 函数功能描述如下:
      * @Description:
      *     当连接建立成功时，调用该函数，用以及时刷新用户列表
+     *     具体功能是每个连接一旦建立，首先将他加到用户列表属性Map中，
+     *     然后向所有用户（连同自己）发送更新后的用户列表用以前端展示
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username){
         sessionMap.put(username,session);
         logger.info("有新用户加入，用户名为{}，当前在线总人数为{}",username,sessionMap.size());
-        JSONObject result = new JSONObject();
-        JSONArray jsonArray = new JSONArray();
-        result.set("users",jsonArray);
-        for(Object o :sessionMap.keySet()){
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.set("username",o);
-            jsonArray.add(jsonObject);
-        }
-        sendAllMessage(JSONUtil.toJsonStr(result));
+        sendUserListToAllUsers();
     }
 
     /**
@@ -83,11 +77,31 @@ public class WebSocketServer {
      * <p> 函数功能描述如下:
      * @Description:
      *     当连接关闭时调用该方法，用于更新当前在线的用户列表
+     *     具体功能是将该用户从存储中移除，并告知所有用户
      */
     @OnClose
     public void onClose(Session session,@PathParam("username")String username){
         sessionMap.remove(username);
         logger.info("有一个用户脱离连接，该用户名为{},用户Id为{}，当前在线人数为{}",username,session.getId(),sessionMap.size());
+        sendUserListToAllUsers();
+    }
+
+    /**
+     * @author GengXuelong
+     * <p> 函数功能描述如下:
+     * @Description:
+     *     工具方法，用来实现将当前用户列表发送给所用客户
+     */
+    private void sendUserListToAllUsers() {
+        JSONObject result = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        result.set("users",jsonArray);
+        for(Object o :sessionMap.keySet()){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.set("username",o);
+            jsonArray.add(jsonObject);
+        }
+        sendAllMessage(JSONUtil.toJsonStr(result));
     }
 
     /**
@@ -95,6 +109,7 @@ public class WebSocketServer {
      * <p> 函数功能描述如下:
      * @Description:
      *     当服务器收到客户发送来的一个消息后，便调用该方法，用以处理和中转用户发送的消息
+     *     应为socket只能做到客户和本服务器之间的信息交互，所有想要实现客户之间的信息交互，必定需要服务器做中转
      */
     @OnMessage
     public void onMessage(String message,@PathParam("username")String username){
@@ -105,7 +120,7 @@ public class WebSocketServer {
         if(destinationSession == null){
             logger.info("发送失败，未找到目标客户username={}的session",destinationUsername);
         }else{
-           if(jsonObject.getStr("function")==null){
+           if(jsonObject.getStr("function")==null){//如果没有function字段，则书名该消息为常规的客户间的信息发送
                JSONObject jsonObject1 = new JSONObject();
                //重新组装消息，告知目标用户发送者
                jsonObject1.set("from",username);
@@ -114,13 +129,13 @@ public class WebSocketServer {
                sendMessage(jsonObject1.toString(),destinationSession);
            }else{
                String function = jsonObject.getStr("function");
-               if(function.equals("leave")){
+               if(function.equals("leave")){//当function字段为leave时，说明来源客户希望与目标客户断开交流
                    JSONObject jsonObject1 = new JSONObject();
                    //重新组装消息，告知目标用户发送者
                    jsonObject1.set("from",username);
                    jsonObject1.set("function","leave");
                    sendMessage(jsonObject1.toString(),destinationSession);
-               }else{
+               }else{//当function为link时，说明来源客户希望和目标客户建立交流
                    JSONObject jsonObject1 = new JSONObject();
                    //重新组装消息，告知目标用户发送者
                    jsonObject1.set("from",username);
