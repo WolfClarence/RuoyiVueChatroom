@@ -84,6 +84,24 @@ public class WebSocketServer {
         sessionMap.remove(username);
         logger.info("有一个用户脱离连接，该用户名为{},用户Id为{}，当前在线人数为{}",username,session.getId(),sessionMap.size());
         sendUserListToAllUsers();
+        sendLeaveMessageToAllUser(username);
+
+    }
+
+    /**
+     * @author GengXuelong
+     * <p> 函数功能描述如下:
+     * @Description:
+     *     当自己下线时，向所有人广播自己下线的消息，只有和自己有连接的用户才会响应
+     */
+    private void sendLeaveMessageToAllUser(String fromUsername){
+        for(Session session: sessionMap.values()){
+            JSONObject jsonObject1 = new JSONObject();
+            //重新组装消息，告知目标用户发送者
+            jsonObject1.set("from",fromUsername);
+            jsonObject1.set("function","leave");
+            sendMessage(jsonObject1.toString(),session);
+        }
     }
 
     /**

@@ -287,7 +287,7 @@ export default {
           let tip = data.function;
           console.log("function:"+tip);
           let remoteFriend = data.from;
-          if(tip==='leave'){
+          if(tip==='leave'&&this.chatUser===remoteFriend){
             window.alert("用户名为 "+remoteFriend+" 的用户取消了和你的通信")
           }else{
             //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
@@ -330,7 +330,7 @@ export default {
       })
     },
     alertChatUserWhenLeave(chatUser){
-      let message = {from: this.user.username, to: this.chatUser, function: 'leave'}
+      let message = {from: this.user.username, to: chatUser, function: 'leave'}
       socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
     }
 
