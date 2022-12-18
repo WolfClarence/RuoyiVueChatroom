@@ -7,16 +7,16 @@
             用户昵称：
           </div>
           <div v-if="user.username===''" style="position: relative;left: 100px">
-            <el-input v-model="inputUsername" clearable style="position: fixed; width: 100px"/>
+            <el-input v-model="inputUsername" clearable :autofocus="true" style="position: fixed; width: 130px;"/>
             <div style="color: red;position: fixed;margin-top: 50px;margin-left: -100px">
             当前状态:未连接
            </div>
           </div>
-          <span v-else style="position: relative;left: 100px">
-            <span style="position: fixed;margin-top: 7px;margin-left: 12px">
-              {{ user.username }}
+          <span v-else style="position: relative;left: 80px">
+            <span style="position: fixed;margin-top: 10px;margin-left: 18px">
+              {{ userNameForShow }}
             </span>
-            <span style="color: #43e143;position: fixed;margin-top: 50px;margin-left: -100px">
+            <span style="color: #43e143;position: fixed;margin-top: 50px;margin-left: -80px">
             当前状态:已连接
            </span>
           </span>
@@ -33,12 +33,14 @@
 
           <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">在线用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span>
           </div>
-          <span>世界聊天</span>
-          <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
-             @click="intoWorld()"></i>
-          <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="isInWorld">world-chat click again to leave</span>
+          <div style="padding: 10px 0">
+            <span>世界聊天</span>
+            <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
+               @click="intoWorld()"></i>
+            <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="isInWorld">world-chat click again to leave</span>
+          </div>
           <div style="padding: 10px 0" v-for="user in users" :key="user.username">
-            <span>{{ user.username }}</span>
+            <span class="text-username">{{ user.username }}</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
                @click="switchFriend(user.username)"></i>
             <span style="font-size: 12px;color: limegreen; margin-left: 5px"
@@ -84,9 +86,18 @@ export default {
       text: "",//发送的信息文本
       messages: [],//发送的信息内容
       content: '',// 框内显示的内容
+      usersRequest:[]
     }
   },
-
+  computed:{
+    userNameForShow(){
+      if(this.user.username.length>=8){
+        return this.user.username.slice(0,8)+'..'
+      }else {
+        return this.user.username
+      }
+    }
+  },
   methods: {
     intoWorld() {
       console.log('intoWorld')
@@ -262,7 +273,8 @@ export default {
           _this.users = data.users.filter(user => user.username !== _this.user.username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
         }else if(!data.text){
           let remoteFriend = data.from;
-          window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
+          //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
+          _this.handleRequest(remoteFriend)
         }
         else {
           // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
@@ -283,12 +295,24 @@ export default {
         console.log("websocket发生了错误");
       }
     },
+    handleRequest(username){
+      this.$message({
+        message: "用户名为 "+username+" 的用户想和你通信",
+        type: 'success'
+      });
+      for (const usersKey in this.users) {
+        if(this.users[usersKey].username===username){
+          let userTmp=this.users[usersKey]
+          this.usersRequest[usersKey]=true
+        }
+      }
+    },
     updateScroll() {
       this.$nextTick(() => {
         let container = this.$el.querySelector("#main");
         container.scrollTop = container.scrollHeight;
       })
-    }
+    },
 
   }
 }
