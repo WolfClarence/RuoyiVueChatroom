@@ -287,8 +287,8 @@ export default {
           let tip = data.function;
           console.log("function:"+tip);
           let remoteFriend = data.from;
-          if(tip==='leave'&&this.chatUser===remoteFriend){
-            window.alert("用户名为 "+remoteFriend+" 的用户取消了和你的通信")
+          if(tip==='leave'){
+                  window.alert("用户名为 "+remoteFriend+" 的用户取消了和你的通信")
           }else if(tip==='link'){
             //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
             _this.handleRequest(remoteFriend)
