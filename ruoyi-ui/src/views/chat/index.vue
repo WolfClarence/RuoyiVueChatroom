@@ -2,14 +2,37 @@
   <div style="padding: 10px; margin-bottom: 50px">
     <el-row>
       <el-col :span="4">
-        <el-card style="width: 300px; height: 300px; color: #333">
-          <div v-if="user.username!=''">
-            用户昵称： {{user.username}}
+        <div style="position: fixed">
+          <div style="position: relative;left: 0;top: 30px">
+            用户昵称：
           </div>
-          <div style="color: red;" v-else>
-            未连接
+          <div v-if="user.username===''" style="position: relative;left: 100px">
+            <el-input v-model="inputUsername" clearable style="position: fixed; width: 100px"/>
+            <div style="color: red;position: fixed;margin-top: 50px;margin-left: -100px">
+            当前状态:未连接
+           </div>
           </div>
-          <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">在线用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span></div>
+          <span v-else style="position: relative;left: 100px">
+            <span style="position: fixed;margin-top: 7px;margin-left: 12px">
+              {{ user.username }}
+            </span>
+            <span style="color: #43e143;position: fixed;margin-top: 50px;margin-left: -100px">
+            当前状态:已连接
+           </span>
+          </span>
+          <span v-if="user.username===''" style="position: relative;left: 150px">
+            <el-button type="primary" size="mini" @click="linking"
+                       style="position:relative;left: 100px;margin-top: 4px">完成</el-button>
+          </span>
+          <span v-else style="position: relative;left: 150px">
+            <el-button type="primary" size="mini" @click="updateUsername"
+                       style="position:relative;left: 100px;margin-top: 4px">修改</el-button>
+          </span>
+        </div>
+        <el-card style="width: 300px; height: 300px; color: #333;margin-top: 100px">
+
+          <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">在线用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span>
+          </div>
           <span>世界聊天</span>
           <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
              @click="intoWorld()"></i>
@@ -18,7 +41,8 @@
             <span>{{ user.username }}</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
                @click="switchFriend(user.username)"></i>
-            <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="user.username === chatUser&&isInWorld==false">chatting...</span>
+            <span style="font-size: 12px;color: limegreen; margin-left: 5px"
+                  v-if="user.username === chatUser&&isInWorld===false">chatting...</span>
           </div>
         </el-card>
       </el-col>
@@ -26,19 +50,14 @@
         <div style="width: 800px; margin: 0 auto; background-color: white;
                     border-radius: 5px; box-shadow: 0 0 10px #ccc">
           <div style="text-align: center; line-height: 50px;">
-            Web聊天室（{{isInWorld?'世界聊天': chatUser }}）
+            Web聊天室（{{ isInWorld ? '世界聊天' : chatUser }}）
           </div>
           <div id="main" style="height: 350px; overflow:auto; border-top: 1px solid #ccc" v-html="content"></div>
           <div style="height: 200px">
-            <textarea v-model="text" style="height: 160px; width: 100%; padding: 20px; border: none; border-top: 1px solid #ccc;
-             border-bottom: 1px solid #ccc; outline: none"></textarea>
-            <div style="text-align: right; padding-right: 10px">
-              <el-button type="primary" size="mini" @click="send">发送</el-button>
+            <textarea v-model="text" style="margin: 0" @keydown.enter="send"></textarea>
+            <div style="padding: 0;margin: 0">
+              <button class="send-btn" @click="send" style="width: 100%">发送</button>
             </div>
-            <input v-model="inputUsername"/>
-            <el-button type="primary" size="mini" @click="linking">连接</el-button>
-            <p style="color: blue;" v-if="isLinked">已连接</p>
-            <p style="color:red;" v-else>未连接</p>
           </div>
         </div>
       </el-col>
@@ -47,18 +66,19 @@
 </template>
 <script>
 import axios from 'axios';
-axios.defaults.baseURL='http://localhost:8080';
+
+axios.defaults.baseURL = 'http://localhost:8080';
 let socket;
 export default {
   name: "Im",
   data() {
     return {
       user: {
-        username:''
+        username: ''
       },//当前用户
       isLinked: false,
       isInWorld: false,
-      inputUsername : "",
+      inputUsername: "",
       users: [],
       chatUser: '',//交谈的对象
       text: "",//发送的信息文本
@@ -68,92 +88,106 @@ export default {
   },
 
   methods: {
-    intoWorld(){
+    intoWorld() {
       console.log('intoWorld')
-      if(this.isLinked){
-        if(this.isInWorld===false){
+      if (this.isLinked) {
+        if (this.isInWorld === false) {
           this.isInWorld = true;
-          axios("/chat/hello").then(res=>{
+          axios("/chat/hello").then(res => {
             this.content = ''
             res.data.forEach(element => {
-              console.log(element.username,element.text)
-              if(element.username===this.user.username){
-                this.createContent(null,element.username,element.text)
-              }else{
-                this.createContent(element.username,null,element.text)
+              console.log(element.username, element.text)
+              if (element.username === this.user.username) {
+                this.createContent(null, element.username, element.text)
+              } else {
+                this.createContent(element.username, null, element.text)
               }
-
             });
             this.updateScroll();
           })
           // this.updateScroll();//此函数必须和dom变化紧挨着
-          this.Interval = setInterval(()=>{
-            axios("/chat/hello").then(res=>{
+          this.Interval = setInterval(() => {
+            axios("/chat/hello").then(res => {
               this.content = '';
               res.data.forEach(element => {
-                console.log(element.username,element.text)
-                if(element.username==this.user.username){
-                  this.createContent(null,element.username,element.text)
-                }else{
-                  this.createContent(element.username,null,element.text)
+                console.log(element.username, element.text)
+                if (element.username == this.user.username) {
+                  this.createContent(null, element.username, element.text)
+                } else {
+                  this.createContent(element.username, null, element.text)
                 }
               });
               this.updateScroll();
             })
-          },2000);
-        }else{
+          }, 2000);
+        } else {
           this.isInWorld = false;
           this.content = '';
           clearInterval(this.Interval);
         }
 
-      }else{
+      } else {
         window.alert("请先连接，连接后才能进入世界大厅哟")
       }
 
     },
-    switchFriend(username){
-      console.log('switchFriend')
-      this.chatUser = username;
-      this.content = '';
+    switchFriend(username) {
+      if (this.isInWorld === false) {
+        console.log('switchFriend')
+        this.chatUser = username;
+        this.content = '';
+      } else {
+        this.isInWorld = false;
+        this.content = '';
+        clearInterval(this.Interval);
+        console.log('switchFriend')
+        this.chatUser = username;
+        this.content = '';
+      }
     },
     send() {
-      if(this.isInWorld==false){//私聊发送按钮
-        if (!this.chatUser) {
-          this.$message({type: 'warning', message: "请选择聊天对象"})
-          return;
-        }
-        if (!this.text) {
-          this.$message({type: 'warning', message: "请输入内容"})
-        } else {
-          if (typeof (WebSocket) == "undefined") {
-            console.log("您的浏览器不支持WebSocket");
-          } else {
-            console.log("您的浏览器支持WebSocket");
-            // 组装待发送的消息 json
-            // {"from": "zhang", "to": "admin", "text": "聊天文本"}
-            let message = {from: this.user.username, to: this.chatUser, text: this.text}
-            socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
-            this.messages.push({user: this.user.username, text: this.text})
-            // 构建消息内容，本人消息
-            this.createContent(null, this.user.username, this.text)
-            this.text = '';
+      if (this.user.username === '') {
+        window.alert("未连接哦亲")
+      } else {
+        if (this.isInWorld === false) {//私聊发送按钮
+          if (!this.chatUser) {
+            this.$message({type: 'warning', message: "请选择聊天对象"})
+            return;
           }
+          if (!this.text) {
+            this.$message({type: 'warning', message: "请输入内容"})
+          } else {
+            if (typeof (WebSocket) == "undefined") {
+              console.log("您的浏览器不支持WebSocket");
+            } else {
+              console.log("您的浏览器支持WebSocket");
+              // 组装待发送的消息 json
+              // {"from": "zhang", "to": "admin", "text": "聊天文本"}
+              let message = {from: this.user.username, to: this.chatUser, text: this.text}
+              socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
+              this.messages.push({user: this.user.username, text: this.text})
+              // 构建消息内容，本人消息
+              this.createContent(null, this.user.username, this.text)
+              this.text = '';
+            }
+          }
+        } else {//世界大厅发送按钮
+          // 构建消息内容，本人消息
+          this.createContent(null, this.user.username, this.text)
+          let username = this.user.username;
+          let text = this.text;
+          axios.post("/chat/add", {
+            "username": username,
+            "text": text,
+          }).then(res => {
+            console.log(res.data)
+          }).catch(e => {
+          })
+          this.text = '';
+          this.updateScroll();
         }
-      }else{//世界大厅发送按钮
-        // 构建消息内容，本人消息
-        this.createContent(null, this.user.username, this.text)
-        let username = this.user.username;
-        let text = this.text;
-        axios.post("/chat/add",{
-          "username":username,
-          "text":text,
-        }).then(res=>{
-          console.log(res.data)
-        }).catch(e=>{})
-        this.text = '';
-        this.updateScroll();
       }
+
     },
     createContent(remoteUser, nowUser, text) {  // 这个方法是用来将 json的聊天消息数据转换成 html的。
       let html
@@ -186,9 +220,9 @@ export default {
     },
     linking() {
       console.log("linking")
-      if(this.user.username!==''){
-        window.alert("您已经连接了亲，您的用户名是: "+this.user.username)
-      }else if(this.inputUsername!==''){
+      if (this.user.username !== '') {
+        window.alert("您已经连接了亲，您的用户名是: " + this.user.username)
+      } else if (this.inputUsername !== '') {
         this.user.username = this.inputUsername;
         this.isLinked = true;
         let _this = this;
@@ -196,20 +230,23 @@ export default {
           console.log("您的浏览器不支持WebSocket");
         } else {
           console.log("您的浏览器支持WebSocket");
-          let socketUrl = "ws://localhost:8080/chat/myServer/" + this.user.username;
+          let socketUrl = "ws://localhost:8080/chat/myServer/ " + this.user.username;
           if (socket != null) {
             socket.close();
             socket = null;
           }
           // 开启一个websocket服务
           socket = new WebSocket(socketUrl);
-          this.handleSocket(socket,_this);
+          this.handleSocket(socket, _this);
         }
-      }else{
+      } else {
         window.alert("请输入用户名呀亲，不输入是没法连接的哟")
       }
     },
-    handleSocket(socket,_this){
+    updateUsername() {
+      this.user.username = ''
+    },
+    handleSocket(socket, _this) {
       //打开事件
       socket.onopen = function () {
         console.log("websocket已打开");
@@ -239,9 +276,9 @@ export default {
         console.log("websocket发生了错误");
       }
     },
-    updateScroll(){
+    updateScroll() {
       this.$nextTick(() => {
-        var container = this.$el.querySelector("#main");
+        let container = this.$el.querySelector("#main");
         container.scrollTop = container.scrollHeight;
       })
     }
@@ -256,14 +293,56 @@ export default {
   border-radius: 10px;
   font-family: sans-serif;
   padding: 10px;
-  width:auto;
-  display:inline-block !important;
-  display:inline;
+  width: auto;
+  display: inline-block !important;
 }
+
 .right {
   background-color: deepskyblue;
 }
+
 .left {
-  background-color: forestgreen;
+  background-color: #66c213;
+}
+
+textarea {
+  height: 160px;
+  width: 100%;
+  padding: 20px;
+  margin: 0;
+  font-size: 16px;
+  font-family: "Times New Roman", Times, serif;
+  border: none;
+  border-top: 1px solid #ccc;
+  outline: none;
+  resize: none;
+}
+
+.send-btn {
+  background: #d6e5e4;
+  color: #000;
+  outline: none;
+  display: block;
+  border: none;
+  cursor: pointer;
+  padding: 9px 38px;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: 0.3s all;
+  -webkit-transition: 0.3s all;
+  -moz-transition: 0.3s all;
+  -o-transition: 0.3s all;
+  -ms-transition: 0.3s all;
+}
+
+.send-btn:hover {
+  background: #62eade;
+  color: #ffffff;
+  transition: 0.3s all;
+  -webkit-transition: 0.3s all;
+  -moz-transition: 0.3s all;
+  -o-transition: 0.3s all;
+  -ms-transition: 0.3s all;
 }
 </style>

@@ -2,9 +2,8 @@ package com.ruoyi.chat.service;
 
 
 
-import com.ruoyi.chat.mapper.MessageMapper;
+import com.ruoyi.chat.service.mapper.MessageMapper;
 import com.ruoyi.chat.pojo.Message;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

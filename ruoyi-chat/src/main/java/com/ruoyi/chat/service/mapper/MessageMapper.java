@@ -1,4 +1,4 @@
-package com.ruoyi.chat.mapper;
+package com.ruoyi.chat.service.mapper;
 
 
 import com.ruoyi.chat.pojo.Message;
