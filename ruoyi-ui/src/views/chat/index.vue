@@ -81,7 +81,7 @@ export default {
       isLinked: false,
       isInWorld: false,
       inputUsername: "",
-      users: [],
+      users: [],//在线用户列表
       chatUser: '',//交谈的对象
       text: "",//发送的信息文本
       messages: [],//发送的信息内容
@@ -103,7 +103,11 @@ export default {
       console.log('intoWorld')
       if (this.isLinked) {
         if (this.isInWorld === false) {
+          if(this.chatUser!==''){
+            this.alertChatUserWhenLeave(this.chatUser)
+          }
           this.isInWorld = true;
+          this.chatUser = '';
           axios("/chat/hello").then(res => {
             this.content = ''
             res.data.forEach(element => {
@@ -122,7 +126,7 @@ export default {
               this.content = '';
               res.data.forEach(element => {
                 console.log(element.username, element.text)
-                if (element.username == this.user.username) {
+                if (element.username === this.user.username) {
                   this.createContent(null, element.username, element.text)
                 } else {
                   this.createContent(element.username, null, element.text)
@@ -143,6 +147,13 @@ export default {
 
     },
     switchFriend(username) {
+      if(username===this.chatUser){
+        window.alert("已经和她连接了哟")
+        return;
+      }
+      if(this.chatUser!==''){
+        this.alertChatUserWhenLeave(this.chatUser)
+      }
       if (this.isInWorld === false) {
         console.log('switchFriend')
         this.chatUser = username;
@@ -155,7 +166,7 @@ export default {
         this.chatUser = username;
         this.content = '';
       }
-      let message = {to: this.chatUser,function:'tip'}
+      let message = {to: this.chatUser,function:'link'}
       socket.send(JSON.stringify(message));
     },
     send() {
@@ -269,18 +280,23 @@ export default {
       socket.onmessage = function (msg) {
         console.log("收到数据====" + msg.data)
         let data = JSON.parse(msg.data)  // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
-        if (data.users) {  // 获取在线人员信息
+        console.log(data)
+        if (data.users) {  // 如果存在该users字段，说明这时公共消息，则如下处理
           _this.users = data.users.filter(user => user.username !== _this.user.username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
-        }else if(!data.text){
+        }else if(data.text==null){//如果不含text字段，说明这时一条通知类信息
+          let tip = data.function;
+          console.log("function:"+tip);
           let remoteFriend = data.from;
-          //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
-          _this.handleRequest(remoteFriend)
-        }
-        else {
+          if(tip==='leave'){
+            window.alert("用户名为 "+remoteFriend+" 的用户取消了和你的通信")
+          }else{
+            //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
+            _this.handleRequest(remoteFriend)
+          }
+        } else {//如果包含text字段，则说明是常规聊天信息
           // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
           //  // {"from": "zhang", "text": "hello"}
           if (data.from === _this.chatUser) {
-            // _this.messages.push(data)//不做消息保存
             // 构建消息内容
             _this.createContent(data.from, null, data.text)
           }
@@ -313,6 +329,10 @@ export default {
         container.scrollTop = container.scrollHeight;
       })
     },
+    alertChatUserWhenLeave(chatUser){
+      let message = {from: this.user.username, to: this.chatUser, function: 'leave'}
+      socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
+    }
 
   }
 }

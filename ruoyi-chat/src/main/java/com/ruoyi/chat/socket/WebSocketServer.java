@@ -113,12 +113,20 @@ public class WebSocketServer {
                jsonObject1.set("text",text);
                sendMessage(jsonObject1.toString(),destinationSession);
            }else{
-               JSONObject jsonObject1 = new JSONObject();
-               //重新组装消息，告知目标用户发送者
-               jsonObject1.set("from",username);
-               jsonObject1.set("tip","tip");
-               String tip = "tip";
-               sendMessage(jsonObject1.toString(),destinationSession);
+               String function = jsonObject.getStr("function");
+               if(function.equals("leave")){
+                   JSONObject jsonObject1 = new JSONObject();
+                   //重新组装消息，告知目标用户发送者
+                   jsonObject1.set("from",username);
+                   jsonObject1.set("function","leave");
+                   sendMessage(jsonObject1.toString(),destinationSession);
+               }else{
+                   JSONObject jsonObject1 = new JSONObject();
+                   //重新组装消息，告知目标用户发送者
+                   jsonObject1.set("from",username);
+                   jsonObject1.set("function","link");
+                   sendMessage(jsonObject1.toString(),destinationSession);
+               }
            }
         }
     }
