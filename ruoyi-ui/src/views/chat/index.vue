@@ -30,19 +30,25 @@
           </span>
         </div>
         <el-card style="width: 300px; height: 300px; color: #333;margin-top: 100px">
-
-          <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">在线用户<span style="font-size: 12px">（点击聊天气泡开始聊天）</span>
+          <div style="padding-bottom: 10px; border-bottom: 1px solid #ccc">
+            在线用户
+            <span style="font-size: 12px">
+            （点击聊天气泡开始聊天）
+          </span>
           </div>
           <div style="padding: 10px 0">
             <span>世界聊天</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
                @click="intoWorld()"></i>
-            <span style="font-size: 12px;color: limegreen; margin-left: 5px" v-if="isInWorld">world-chat click again to leave</span>
+            <span style="font-size: 12px;color: limegreen; margin-left: 5px"
+                  v-if="isInWorld">world-chat click again to leave</span>
           </div>
           <div style="padding: 10px 0" v-for="user in users" :key="user.username">
             <span class="text-username">{{ user.username }}</span>
             <i class="el-icon-chat-dot-round" style="margin-left: 10px; font-size: 16px; cursor: pointer"
                @click="switchFriend(user.username)"></i>
+            <i class="el-icon-bell" v-if="contains(requestUsers,user.username.trim())"
+               style="margin-left: 10px; font-size: 16px;"></i>
             <span style="font-size: 12px;color: limegreen; margin-left: 5px"
                   v-if="user.username === chatUser&&isInWorld===false">chatting...</span>
           </div>
@@ -81,12 +87,18 @@ export default {
       isLinked: false,
       isInWorld: false,
       inputUsername: "",
-      users: [],//在线用户列表
-      chatUser: '',//交谈的对象
-      text: "",//发送的信息文本
-      messages: [],//发送的信息内容
-      content: '',// 框内显示的内容
-      usersRequest:[]
+      //在线用户列表
+      users: [],
+      //交谈的对象
+      chatUser: '',
+      //发送的信息文本
+      text: "",
+      //发送的信息内容
+      messages: [],
+      // 框内显示的内容
+      content: '',
+      //请求聊天的用户的用户名列表
+      requestUsers:[]
     }
   },
   computed:{
@@ -279,23 +291,27 @@ export default {
       //  浏览器端收消息，获得从服务端发送过来的文本消息
       socket.onmessage = function (msg) {
         console.log("收到数据====" + msg.data)
-        let data = JSON.parse(msg.data)  // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
+        // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
+        let data = JSON.parse(msg.data)
         console.log(data)
-        if (data.users) {  // 如果存在该users字段，说明这时公共消息，则如下处理
-          _this.users = data.users.filter(user => user.username !== _this.user.username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
-        }else if(data.text==null){//如果不含text字段，说明这时一条通知类信息
+        if (data.users) {
+          // 如果存在该users字段，说明这时公共消息，则如下处理
+          _this.users = data.users.filter(user => user.username !== _this.user.username)
+          // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
+        }else if(data.text==null){
+          //如果不含text字段，说明这时一条通知类信息
           let tip = data.function;
           console.log("function:"+tip);
           let remoteFriend = data.from;
           if(tip==='leave'){
-                  window.alert("用户名为 "+remoteFriend+" 的用户取消了和你的通信")
+            _this.handleDisconnect(remoteFriend)
           }else if(tip==='link'){
-            //window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
             _this.handleRequest(remoteFriend)
           }
-        } else {//如果包含text字段，则说明是常规聊天信息
+        } else {
+          //如果包含text字段，则说明是常规聊天信息
           // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
-          //  // {"from": "zhang", "text": "hello"}
+          //   {"from": "zhang", "text": "hello"}
           if (data.from === _this.chatUser) {
             // 构建消息内容
             _this.createContent(data.from, null, data.text)
@@ -316,10 +332,22 @@ export default {
         message: "用户名为 "+username+" 的用户想和你通信",
         type: 'success'
       });
-      for (const usersKey in this.users) {
-        if(this.users[usersKey].username===username){
-          let userTmp=this.users[usersKey]
-          this.usersRequest[usersKey]=true
+      this.requestUsers.push(username)
+      console.log('iiiiiiiiiiiiiii'+this.requestUsers)
+      console.log(this.requestUsers)
+      console.log(this.requestUsers[0])
+      console.log(this.contains(this.requestUsers,'111'))
+      console.log(this.requestUsers[0].trim()===111)
+    },
+    handleDisconnect(username){
+      this.$message({
+        message: "用户名为 "+username+" 的用户断开了通信",
+        type: 'warning'
+      });
+      for (let i = 0; i < this.requestUsers.length; i++) {
+        if (this.requestUsers[i]===username){
+          this.requestUsers.splice(i,1)
+          console.log('iiiiiiiiiiiiiii'+this.requestUsers)
         }
       }
     },
@@ -331,9 +359,15 @@ export default {
     },
     alertChatUserWhenLeave(chatUser){
       let message = {from: this.user.username, to: chatUser, function: 'leave'}
-      socket.send(JSON.stringify(message));  // 将组装好的json发送给服务端，由服务端进行转发
+      // 将组装好的json发送给服务端，由服务端进行转发
+      socket.send(JSON.stringify(message));
+    },
+    contains(arr,e){
+      for (let i = 0; i < arr.length; i++) {
+        if(arr[i].trim()===e) return true
+      }
+      return false
     }
-
   }
 }
 </script>
