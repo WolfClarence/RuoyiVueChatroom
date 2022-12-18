@@ -101,16 +101,25 @@ public class WebSocketServer {
         logger.info("服务器收到用户username={}发送来的消息：{}" ,username,message);
         JSONObject jsonObject = JSONUtil.parseObj(message);
         String destinationUsername = jsonObject.getStr("to");//目标用户名
-        String text = jsonObject.getStr("text");//消息文本
         Session destinationSession = sessionMap.get(destinationUsername);
         if(destinationSession == null){
             logger.info("发送失败，未找到目标客户username={}的session",destinationUsername);
         }else{
-            JSONObject jsonObject1 = new JSONObject();
-            //重新组装消息，告知目标用户发送者
-            jsonObject1.set("from",username);
-            jsonObject1.set("text",text);
-            sendMessage(jsonObject1.toString(),destinationSession);
+           if(jsonObject.getStr("function")==null){
+               JSONObject jsonObject1 = new JSONObject();
+               //重新组装消息，告知目标用户发送者
+               jsonObject1.set("from",username);
+               String text = jsonObject.getStr("text");//消息文本
+               jsonObject1.set("text",text);
+               sendMessage(jsonObject1.toString(),destinationSession);
+           }else{
+               JSONObject jsonObject1 = new JSONObject();
+               //重新组装消息，告知目标用户发送者
+               jsonObject1.set("from",username);
+               jsonObject1.set("tip","tip");
+               String tip = "tip";
+               sendMessage(jsonObject1.toString(),destinationSession);
+           }
         }
     }
 

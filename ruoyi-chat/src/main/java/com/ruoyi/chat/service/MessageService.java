@@ -2,7 +2,7 @@ package com.ruoyi.chat.service;
 
 
 
-import com.ruoyi.chat.service.mapper.MessageMapper;
+import com.ruoyi.chat.mapper.MessageMapper;
 import com.ruoyi.chat.pojo.Message;
 import org.springframework.stereotype.Service;
 

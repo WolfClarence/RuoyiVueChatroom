@@ -144,10 +144,12 @@ export default {
         this.chatUser = username;
         this.content = '';
       }
+      let message = {to: this.chatUser,function:'tip'}
+      socket.send(JSON.stringify(message));
     },
     send() {
       if (this.user.username === '') {
-        window.alert("未连接哦亲")
+        this.$message({type: 'warning', message: "未连接哟，请连接"})
       } else {
         if (this.isInWorld === false) {//私聊发送按钮
           if (!this.chatUser) {
@@ -257,7 +259,11 @@ export default {
         let data = JSON.parse(msg.data)  // 对收到的json数据进行解析， 类似这样的： {"users": [{"username": "zhang"},{ "username": "admin"}]}
         if (data.users) {  // 获取在线人员信息
           _this.users = data.users.filter(user => user.username !== _this.user.username)  // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
-        } else {
+        }else if(!data.text){
+          let remoteFriend = data.from;
+          window.alert("用户名为 "+remoteFriend+" 的用户想和你通信")
+        }
+        else {
           // 如果服务器端发送过来的json数据 不包含 users 这个key，那么发送过来的就是聊天文本json数据
           //  // {"from": "zhang", "text": "hello"}
           if (data.from === _this.chatUser) {
