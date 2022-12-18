@@ -296,7 +296,7 @@ export default {
         console.log(data)
         if (data.users) {
           // 如果存在该users字段，说明这时公共消息，则如下处理
-          _this.users = data.users.filter(user => user.username !== _this.user.username)
+          _this.users = data.users.filter(user => user.username.trim() !== _this.user.username.trim())
           // 获取当前连接的所有用户信息，并且排除自身，自己不会出现在自己的聊天列表里
         }else if(data.text==null){
           //如果不含text字段，说明这时一条通知类信息
