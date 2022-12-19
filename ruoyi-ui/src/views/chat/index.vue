@@ -53,6 +53,7 @@
                   v-if="user.username === chatUser&&isInWorld===false">chatting...</span>
           </div>
         </el-card>
+        <i @click="openDialog" class="el-icon-setting"></i>
       </el-col>
       <el-col :span="20">
         <div style="width: 800px; margin: 0 auto; background-color: white;
@@ -62,7 +63,10 @@
           </div>
           <div id="main" style="height: 350px; overflow:auto; border-top: 1px solid #ccc" v-html="content"></div>
           <div style="height: 200px">
-            <textarea v-model="text" style="margin: 0" @keydown.enter="send"></textarea>
+            <textarea v-if="enableEnter&&enableCtrlEnter" v-model="text" style="margin: 0" @keydown.enter.prevent="send" @keydown.ctrl.enter="send"></textarea>
+            <textarea v-if="enableEnter&&!enableCtrlEnter" v-model="text" style="margin: 0" @keydown.enter.prevent="send"></textarea>
+            <textarea v-if="!enableEnter&&enableCtrlEnter" v-model="text" style="margin: 0" @keydown.ctrl.enter="send"></textarea>
+            <textarea v-if="!enableEnter&&!enableCtrlEnter" v-model="text" style="margin: 0"></textarea>
             <div style="padding: 0;margin: 0">
               <button class="send-btn" @click="send" style="width: 100%">发送</button>
             </div>
@@ -70,6 +74,13 @@
         </div>
       </el-col>
     </el-row>
+    <el-dialog title="设置" :visible.sync="open" width="600px" append-to-body>
+      <el-checkbox v-model="enableEnter">按enter发送</el-checkbox>
+      <el-checkbox v-model="enableCtrlEnter">按ctrl+enter发送</el-checkbox>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeDialog">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -109,7 +120,13 @@ export default {
       // 框内显示的内容
       content: '',
       //请求聊天的用户的用户名列表
-      requestUsers:[]
+      requestUsers:[],
+      //设置对话框是否打开
+      open:false,
+      //按enter键发送
+      enableEnter:true,
+      //按ctrl+enter键发送
+      enableCtrlEnter:false,
     }
   },
 
@@ -529,6 +546,12 @@ export default {
         if(arr[i].trim()===e) return true
       }
       return false
+    },
+    openDialog(){
+      this.open=true
+    },
+    closeDialog() {
+      this.open=false
     }
   }
 }
