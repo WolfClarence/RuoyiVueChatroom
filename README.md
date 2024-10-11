@@ -1,3 +1,10 @@
+This is the version of adding a new chatroom module of the open source project Ruoyi-Vue.
+
+It is the class project required by our teacher. We need to read and understand a big project, then add a new module to it. Ruoyi-Vue is a popular management system framework, mainly use SpringBoot and Vue.
+
+The part I developed is the front-end page, mainly ruoyi-ui\src\views\chat\index.vue
+
+The original description:
 <p align="center">
 	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
 </p>
